@@ -9,5 +9,6 @@ public interface GameKit {
     List<ItemStack> getContents();
     List<ItemStack> getArmor();
     String getName();
+    ItemStack getIcon();
 
 }

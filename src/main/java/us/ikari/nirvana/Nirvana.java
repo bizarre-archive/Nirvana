@@ -7,8 +7,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import us.ikari.nirvana.game.Game;
 import us.ikari.nirvana.game.GameListeners;
 import us.ikari.nirvana.game.GameLoader;
+import us.ikari.nirvana.game.lobby.GameLobbyListeners;
 import us.ikari.nirvana.game.player.GamePlayerListeners;
-import us.ikari.nirvana.game.state.GameStateListeners;
+import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
 import us.ikari.phoenix.network.redis.RedisNetwork;
@@ -21,6 +22,7 @@ public class Nirvana extends JavaPlugin {
     @Getter private RedisNetwork network;
     @Getter private BasicConfigurationFile configFile;
     @Getter private LanguageConfigurationFile langFile;
+    @Getter private PhoenixGui phoenixGui;
     @Getter private Game game;
 
     @Override
@@ -31,6 +33,7 @@ public class Nirvana extends JavaPlugin {
         langFile = new LanguageConfigurationFile(this, "lang", true);
         network = new RedisNetwork(new RedisNetworkConfiguration(configFile.getStringOrDefault("REDIS.HOST", "localhost")));
         game = new GameLoader(this).getGame();
+        phoenixGui = new PhoenixGui(this);
 
         registerListeners();
     }
@@ -40,7 +43,7 @@ public class Nirvana extends JavaPlugin {
 
         pluginManager.registerEvents(new GameListeners(this), this);
         pluginManager.registerEvents(new GamePlayerListeners(this), this);
-        pluginManager.registerEvents(new GameStateListeners(), this);
+        pluginManager.registerEvents(new GameLobbyListeners(this), this);
     }
 
     public static Nirvana getInstance() {

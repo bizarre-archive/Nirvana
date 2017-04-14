@@ -10,7 +10,6 @@ public class GamePlayer {
     @Getter private final String name;
     @Getter private final GamePlayerData data;
 
-
     public GamePlayer(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;

@@ -1,11 +1,14 @@
 package us.ikari.nirvana.game.player;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.Game;
+import us.ikari.phoenix.gui.menu.example.ExamplePlayerMenu;
 
 public class GamePlayerListeners implements Listener {
 
@@ -13,7 +16,7 @@ public class GamePlayerListeners implements Listener {
     private Game game;
 
     public GamePlayerListeners(Nirvana main) {
-        this.main =main;
+        this.main = main;
         this.game = main.getGame();
     }
 
@@ -23,6 +26,12 @@ public class GamePlayerListeners implements Listener {
         Player player = event.getPlayer();
 
         game.getPlayers().add(new GamePlayer(player.getUniqueId(), player.getName()));
+    }
+
+    @EventHandler
+    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
+        Bukkit.broadcastMessage("talked");
+        event.getPlayer().openInventory(new ExamplePlayerMenu(event.getPlayer(), 18, "Title").getInventory());
     }
 
 }
