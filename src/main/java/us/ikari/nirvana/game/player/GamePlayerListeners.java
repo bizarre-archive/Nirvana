@@ -1,14 +1,16 @@
 package us.ikari.nirvana.game.player;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.Game;
-import us.ikari.phoenix.gui.menu.example.ExamplePlayerMenu;
+import us.ikari.nirvana.game.GameState;
+import us.ikari.nirvana.game.task.GameStartTask;
 
 public class GamePlayerListeners implements Listener {
 
@@ -29,9 +31,37 @@ public class GamePlayerListeners implements Listener {
     }
 
     @EventHandler
-    public void onAsyncPlayerChatEvent(AsyncPlayerChatEvent event) {
-        Bukkit.broadcastMessage("talked");
-        event.getPlayer().openInventory(new ExamplePlayerMenu(event.getPlayer(), 18, "Title").getInventory());
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        if (game.shouldStart()) {
+            game.getActiveTasks().add(new GameStartTask(game));
+            game.getGameTime().reset();
+        }
     }
 
+    @EventHandler
+    public void onPlayerQuitEvent(PlayerQuitEvent event) {
+        GamePlayer gamePlayer = game.getByPlayer(event.getPlayer());
+
+        if (gamePlayer != null) {
+            gamePlayer.getData().spawnLocation(null);
+            gamePlayer.getData().alive(false);
+        }
+
+        if (game.getState() != GameState.LOBBY) {
+            event.setQuitMessage(null);
+        }
+
+        //not going to remove because we want to save all participating players later
+    }
+
+    @EventHandler
+    public void onPlayerDeathEvent(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        GamePlayer gamePlayer = game.getByPlayer(player);
+
+        if (gamePlayer != null) {
+            gamePlayer.getData().alive(false);
+        }
+
+    }
 }

@@ -3,3 +3,6 @@ name: ${project.name}
 description: ${project.description}
 version: ${project.version}
 author: Ikari Development Team
+depend: [WorldEdit]
+
+load: STARTUP

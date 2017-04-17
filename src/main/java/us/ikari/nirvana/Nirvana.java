@@ -2,20 +2,30 @@ package us.ikari.nirvana;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.ikari.nirvana.game.Game;
+import us.ikari.nirvana.game.GameChunkGenerator;
 import us.ikari.nirvana.game.GameListeners;
 import us.ikari.nirvana.game.GameLoader;
-import us.ikari.nirvana.game.lobby.GameLobbyListeners;
+import us.ikari.nirvana.game.board.GameBoardAdapter;
+import us.ikari.nirvana.game.chest.GameChestListeners;
 import us.ikari.nirvana.game.player.GamePlayerListeners;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
+import us.ikari.phoenix.scoreboard.Aether;
 
-public class Nirvana extends JavaPlugin {
+public class Nirvana extends JavaPlugin implements Listener {
 
     private static Nirvana instance;
 
@@ -32,10 +42,36 @@ public class Nirvana extends JavaPlugin {
         configFile = new BasicConfigurationFile(this, "config", true);
         langFile = new LanguageConfigurationFile(this, "lang", true);
         network = new RedisNetwork(new RedisNetworkConfiguration(configFile.getStringOrDefault("REDIS.HOST", "localhost")));
-        game = new GameLoader(this).getGame();
         phoenixGui = new PhoenixGui(this);
 
-        registerListeners();
+        Bukkit.getPluginManager().registerEvents(this, this);
+    }
+
+    @Override
+    public void onDisable() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.eject();
+        }
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Player) {
+                    continue;
+                }
+                entity.remove();
+            }
+        }
+     }
+
+    public void setGame(Game game) {
+        if (this.game == null) {
+            this.game = game;
+            registerListeners();
+            registerBoard();
+        }
+    }
+
+    private void registerBoard() {
+        new Aether(this, new GameBoardAdapter(this));
     }
 
     private void registerListeners() {
@@ -43,7 +79,22 @@ public class Nirvana extends JavaPlugin {
 
         pluginManager.registerEvents(new GameListeners(this), this);
         pluginManager.registerEvents(new GamePlayerListeners(this), this);
-        pluginManager.registerEvents(new GameLobbyListeners(this), this);
+        pluginManager.registerEvents(game.getLobby().getListeners(), this);
+        pluginManager.registerEvents(new GameChestListeners(), this);
+    }
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        return new GameChunkGenerator();
+    }
+
+    @EventHandler
+    public void onWorldLoadEvent(WorldLoadEvent event) {
+        setGame(new GameLoader(this).getGame());
+
+        for (Entity entity : event.getWorld().getEntities()) {
+            entity.remove();
+        }
     }
 
     public static Nirvana getInstance() {

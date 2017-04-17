@@ -1,0 +1,91 @@
+SCOREBOARD:
+  TITLE: "&e&lSKYWARS"
+  LOBBY_WAITING:
+    - "&r"
+    - "&fPlayers:&a {0}/{1}"
+    - "&r&r"
+    - "&fStarting soon.."
+    - "&r&r&r"
+    - "&fServer:&a {3}"
+    - "&r&r&r&r"
+    - "&ewww.ikari.us"
+  LOBBY:
+    - "&r"
+    - "&fPlayers: &a{0}/{1}"
+    - "&r&r"
+    - "&fStarting in:&a {2}s"
+    - "&r&r&r"
+    - "&fServer:&a {3}"
+    - "&r&r&r&r"
+    - "&ewww.ikari.us"
+  GAME:
+    - "&7Solo {0}"
+    - "&r"
+    - "&fPlayers left: &a{2}"
+    - "&r&r"
+    - "&fKills:&a {3}"
+    - "Map:&a {4}"
+    - "&r&r&r&r"
+    - "&Ewww.ikari.us"
+  EVENT_REFILL:
+    - "&7Solo {0}"
+    - "&r"
+    - "&fNext Event:"
+    - "&aRefill {1}"
+    - "&r&r"
+    - "&fPlayers left: &a{2}"
+    - "&r&r&R"
+    - "&fKills:&a {3}"
+    - "&fMap:&a {4}"
+    - "&r&r&R&r&r"
+    - "&Ewww.ikari.us"
+  EVENT_DEATHMATCH:
+    - "&7Solo {0}"
+    - "&r"
+    - "&fNext Event:"
+    - "&cDeathmatch {1}"
+    - "&r&r"
+    - "&fPlayers left: &a{2}"
+    - "&r&r&R"
+    - "&fKills:&a {3}"
+    - "&fMap:&a {4}"
+    - "&r&r&R&r&r"
+    - "&Ewww.ikari.us"
+GAME:
+  EVENT:
+    REFILL_COUNTDOWN: "&6&lChests will be refilled in {0}!"
+    REFILL: "&6&lChests have been refilled!"
+    DEATHMATCH: "&c&lDeathmatch has begun! TNT will now rain from the sky!"
+KIT:
+  DEFAULT:
+    NAME: "Broke Boy"
+    DESCRIPTION: "This is the broke boy kit. If you use it chances are you're broke as FUCK."
+  BOMBER:
+    NAME: "Terrorist"
+    DESCRIPTION: "Blow shit the fuck up, and if you're MLG enough, blow yourself sky-high and land the bitch with your water bucket."
+LOBBY:
+  JOIN: "&a{0}&f has joined the lobby! &a({1}/{2})"
+  QUIT: "&a{0}&f has quit the lobby! &a({1}/{2})"
+  KIT_SELECTION_ITEM:
+    NAME: "&aEULA Violating Kit Selector"
+    LORE:
+      - "&fAre you really so fucking stupid that you don't know how to use this shit?"
+MENU:
+  KIT_SELECTION:
+    SELECTED: "&fYou have selected the fucking &a{0}&f kit!"
+    TITLE: "Select a fucking kit"
+    UNLOCKED:
+      TITLE: "&a{0}"
+      LORE:
+        - "&f{0}" #description
+        - " "
+        - "&aYou own this kit."
+        - "&fClick on this item to select it."
+    LOCKED:
+      TITLE: "&c{0}"
+      LORE:
+        - "&f{0}" #description
+        - " "
+        - "&cYou do not own this kit."
+        - "&fBuy it on our fucking store broke ass."
+      MESSAGE: "&fYou do not own the &c{0}&f kit!"
