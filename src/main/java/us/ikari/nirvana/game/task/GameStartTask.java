@@ -4,7 +4,6 @@ import lombok.Getter;
 import net.minecraft.util.org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -56,8 +55,7 @@ public class GameStartTask extends BukkitRunnable {
 
                 Entity vehicle = player.getVehicle();
                 if (vehicle != null) {
-                    player.eject();
-                    vehicle.eject();
+                    player.leaveVehicle();
                     vehicle.remove();
                 }
 
@@ -84,7 +82,7 @@ public class GameStartTask extends BukkitRunnable {
                            GameChest.getLoadedChests().clear();
                            if (stage == GameEventStage.SECOND_REFILL) {
 
-                               for (Chest chest : GameChest.BASIC.getInstances()) {
+                               for (Location chest : GameChest.BASIC.getInstances()) {
                                    GameChest.BUFFED.getInstances().add(chest);
                                }
 

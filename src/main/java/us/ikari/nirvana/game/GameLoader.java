@@ -6,6 +6,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
+import net.minecraft.util.org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -29,9 +30,11 @@ public class GameLoader {
 
     private Nirvana main;
     private final List<Location> spawnLocations;
+    private String map;
 
     public GameLoader(Nirvana main) {
         this.spawnLocations = new ArrayList<>();
+        this.map = "N/A";
 
         File folder = new File(main.getDataFolder() + File.separator + "schematics");
         if (!folder.exists()) {
@@ -52,7 +55,7 @@ public class GameLoader {
             return;
         }
 
-        Location location = new Location(Bukkit.getWorlds().get(0), 0, 70, 0);
+        Location location = Bukkit.getWorlds().get(0).getSpawnLocation();
 
         File file;
         CuboidClipboard clipboard;
@@ -61,6 +64,7 @@ public class GameLoader {
             System.out.println("Loading " + file.getPath() + "...");
             clipboard = CuboidClipboard.loadSchematic(files.get(new Random().nextInt(files.size())));
             System.out.println("Loaded " + file.getPath() + "!");
+            map = FilenameUtils.removeExtension(file.getName());
         } catch (DataException e) {
             e.printStackTrace();
             return;
@@ -90,17 +94,27 @@ public class GameLoader {
                         spawnLocation.setDirection(new Location(spawnLocation.getWorld(), 0, spawnLocation.getBlockY(), 0).toVector().subtract(spawnLocation.toVector()));
                         spawnLocations.add(spawnLocation);
                     } else {
+
                         int identifier;
                         try {
-                            identifier = Integer.parseInt(sign.getLine(0).replaceAll("[^0-9]", ""));
+                            identifier = Integer.parseInt((sign.getLine(0) + sign.getLine(1) + sign.getLine(2) + sign.getLine(3)).replaceAll("[^0-9]", ""));
                         } catch (Exception ex) {
                             identifier = 0;
                         }
 
-                       GameChest.getByIdentifier(identifier).getInstances().add((Chest) block.getState());
+                       GameChest.getByIdentifier(identifier).getInstances().add(block.getLocation());
                     }
 
                     sign.getBlock().setType(Material.AIR);
+                }
+            }
+
+            for (BlockState state : chunk.getTileEntities()) {
+                if (state instanceof Chest) {
+                    GameChest chest = GameChest.getByBlock(state.getBlock());
+                    if (chest == null) {
+                        GameChest.BASIC.getInstances().add(state.getLocation());
+                    }
                 }
             }
         }
@@ -111,7 +125,7 @@ public class GameLoader {
     }
 
     public Game getGame() {
-        return new Game(spawnLocations);
+        return new Game(map, spawnLocations);
     }
 
 }

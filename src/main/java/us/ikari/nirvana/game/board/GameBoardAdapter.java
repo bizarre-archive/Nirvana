@@ -42,7 +42,7 @@ public class GameBoardAdapter implements BoardAdapter {
 
         if (game.getState() == GameState.PLAY) {
             int event = (int) (GameEventStage.getActiveCountdown(game));
-            return main.getLangFile().getStringList("SCOREBOARD." + (event == 0 ? "GAME" : (game.getRefillStage() == GameEventStage.SECOND_REFILL || game.getRefillStage() == GameEventStage.DEATHMATCH ? "EVENT_DEATHMATCH" : "EVENT_REFILL")), LanguageConfigurationFileLocale.EXPLICIT, DateFormatUtils.format(new Date(), "MM/dd/yyyy"), event >= 60000 ? DurationFormatUtils.formatDuration(event + 1000, "mm:ss") : ((event + 1000) / 1000) + "s", game.getAlivePlayers().size(), player.getStatistic(Statistic.PLAYER_KILLS));
+            return main.getLangFile().getStringList("SCOREBOARD." + (event == 0 ? "GAME" : (game.getRefillStage() == GameEventStage.SECOND_REFILL || game.getRefillStage() == GameEventStage.DEATHMATCH ? "EVENT_DEATHMATCH" : "EVENT_REFILL")), LanguageConfigurationFileLocale.EXPLICIT, DateFormatUtils.format(new Date(), "MM/dd/yyyy"), event >= 60000 ? DurationFormatUtils.formatDuration(event + 1000, "mm:ss") : ((event + 1000) / 1000) + "s", game.getAlivePlayers().size(), player.getStatistic(Statistic.PLAYER_KILLS), game.getMap());
         }
 
         return null;

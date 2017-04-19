@@ -3,7 +3,6 @@ package us.ikari.nirvana.game.kit.type;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import us.ikari.nirvana.game.kit.PermissibleGameKit;
 import us.ikari.nirvana.game.kit.PowerfulGameKit;
 import us.ikari.nirvana.game.kit.ability.GameKitAbility;
 import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
@@ -11,7 +10,7 @@ import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
 import java.util.Arrays;
 import java.util.List;
 
-public class BomberGameKit extends PowerfulGameKit implements PermissibleGameKit {
+public class BomberGameKit extends PowerfulGameKit {
 
     @Override
     public ItemStack[] getContents() {
@@ -33,10 +32,6 @@ public class BomberGameKit extends PowerfulGameKit implements PermissibleGameKit
         return new ItemStack(Material.TNT);
     }
 
-    @Override
-    public String getPermission() {
-        return "kit.bomber";
-    }
 
     @Override
     public List<GameKitAbility> getAbilities() {

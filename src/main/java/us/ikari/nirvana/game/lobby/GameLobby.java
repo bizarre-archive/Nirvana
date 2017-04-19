@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.Game;
 import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
@@ -37,10 +38,16 @@ public class GameLobby {
     }
 
     public void prepare(Player player) {
+        player.getInventory().clear();;
+        player.getInventory().setArmorContents(null);
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(null);
+
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+
+        player.getInventory().setHeldItemSlot(0);;
         player.getInventory().setItem(0, getKitSelector(LanguageConfigurationFileLocale.EXPLICIT)); //TODO Change
     }
 

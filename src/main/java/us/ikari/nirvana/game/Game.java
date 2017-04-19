@@ -2,15 +2,19 @@ package us.ikari.nirvana.game;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.kit.GameKit;
 import us.ikari.nirvana.game.kit.type.BomberGameKit;
 import us.ikari.nirvana.game.kit.type.DefaultGameKit;
+import us.ikari.nirvana.game.kit.type.TrapperGameKit;
 import us.ikari.nirvana.game.lobby.GameLobby;
 import us.ikari.nirvana.game.player.GamePlayer;
 import us.ikari.nirvana.game.task.GameStartTask;
+import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFileLocale;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +28,10 @@ public class Game {
     @Getter private final GameTime gameTime;
     @Getter @Setter private GameState state;
     @Getter @Setter private GameEventStage refillStage;
+    @Getter @Setter private final String map;
 
-    public Game(List<Location> spawnLocations) {
+    public Game(String map, List<Location> spawnLocations) {
+        this.map = map;
         this.lobby = new GameLobby(this, spawnLocations);
         this.players = new ArrayList<>();
         this.activeTasks = new ArrayList<>();
@@ -40,6 +46,7 @@ public class Game {
     private void registerKits() {
         kits.add(new DefaultGameKit());
         kits.add(new BomberGameKit());
+        kits.add(new TrapperGameKit());
     }
 
     public List<GamePlayer> getAlivePlayers() {
@@ -52,6 +59,31 @@ public class Game {
         }
 
         return toReturn;
+    }
+
+    public void update() {
+        if (state != GameState.END) {
+            if (players.size() > 1 && getAlivePlayers().size() == 1) {
+                state = GameState.END;
+
+                Player winner = Bukkit.getPlayer(getAlivePlayers().get(0).getName());
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    for (String message : Nirvana.getInstance().getLangFile().getStringList("GAME.WON", LanguageConfigurationFileLocale.EXPLICIT, winner.getDisplayName(), winner.getDisplayName())) {
+                        player.sendMessage(message);
+                    }
+                }
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            player.kickPlayer(Nirvana.getInstance().getLangFile().getString("GAME.GAME_OVER", LanguageConfigurationFileLocale.EXPLICIT, winner.getDisplayName()));
+                        }
+                        Bukkit.getServer().shutdown();
+                    }
+                }.runTaskLater(Nirvana.getInstance(), 600);
+            }
+        }
     }
 
     public GamePlayer getByPlayer(Player player) {
@@ -95,7 +127,7 @@ public class Game {
     }
 
     public boolean hasEnoughPlayers() {
-        return state == GameState.LOBBY && players.size() >= 1;
+        return state == GameState.LOBBY && players.size() >= 3;
     }
 
 }

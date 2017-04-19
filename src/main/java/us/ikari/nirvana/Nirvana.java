@@ -18,6 +18,7 @@ import us.ikari.nirvana.game.GameLoader;
 import us.ikari.nirvana.game.board.GameBoardAdapter;
 import us.ikari.nirvana.game.chest.GameChestListeners;
 import us.ikari.nirvana.game.player.GamePlayerListeners;
+import us.ikari.nirvana.game.spectator.GameSpectatorListeners;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
@@ -81,6 +82,7 @@ public class Nirvana extends JavaPlugin implements Listener {
         pluginManager.registerEvents(new GamePlayerListeners(this), this);
         pluginManager.registerEvents(game.getLobby().getListeners(), this);
         pluginManager.registerEvents(new GameChestListeners(), this);
+        pluginManager.registerEvents(new GameSpectatorListeners(this), this);
     }
 
     @Override

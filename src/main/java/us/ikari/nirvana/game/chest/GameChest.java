@@ -1,6 +1,7 @@
 package us.ikari.nirvana.game.chest;
 
 import lombok.Getter;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import us.ikari.nirvana.game.chest.content.BasicGameChestContent;
@@ -14,15 +15,15 @@ import java.util.List;
 import java.util.Set;
 
 public enum GameChest {
-    BASIC(0, new BasicGameChestContent(), 4, 8),
-    BUFFED(1, new BuffedGameChestContent(), 4, 8),
-    OP(2, new OverPoweredGameChestContent(), 3, 6);
+    BASIC(0, new BasicGameChestContent(), 8, 12),
+    BUFFED(1, new BuffedGameChestContent(), 8, 12),
+    OP(2, new OverPoweredGameChestContent(), 4, 8);
 
     private static Set<Chest> loadedChests = new HashSet<>();
 
     @Getter private final int identifier;
     @Getter private final GameChestContent content;
-    @Getter private final List<Chest> instances;
+    @Getter private final List<Location> instances;
     @Getter private final int min, max;
 
     GameChest(int identifier, GameChestContent content, int min, int max) {
@@ -45,7 +46,7 @@ public enum GameChest {
     public static GameChest getByBlock(Block block) {
         if (block.getState() instanceof Chest) {
             for (GameChest chest : values()) {
-                if (chest.getInstances().contains(block.getState()) && !loadedChests.contains(block.getState())) {
+                if (chest.getInstances().contains(block.getLocation()) && !loadedChests.contains(block.getState())) {
                     return chest;
                 }
             }

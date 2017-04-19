@@ -72,7 +72,6 @@ public class GameLobbyListeners implements Listener {
 
                     Horse horse = player.getWorld().spawn(player.getLocation(), Horse.class);
                     horse.setPassenger(player);
-                    horse.setTamed(true);
                     horse.setAdult();
                     horse.setMaxHealth(2);
 
@@ -84,8 +83,11 @@ public class GameLobbyListeners implements Listener {
                             GameUtils.removeIntelligence(horse);
                         }
                     }.runTaskLater(main, 2L);
+
+                    break;
                 }
             }
+
         } else {
             //TODO: Throw into spectate mode??
         }
@@ -117,12 +119,12 @@ public class GameLobbyListeners implements Listener {
         event.setQuitMessage(null);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
-            online.sendMessage(main.getLangFile().getString("LOBBY.QUIT", LanguageConfigurationFileLocale.EXPLICIT, player.getDisplayName(), game.getPlayers().size(), game.getLobby().getSpawnLocations().size()));
+            online.sendMessage(main.getLangFile().getString("LOBBY.QUIT", LanguageConfigurationFileLocale.EXPLICIT, player.getDisplayName(), game.getPlayers().size() - 1, game.getLobby().getSpawnLocations().size()));
         }
 
         org.bukkit.entity.Entity entity = player.getVehicle();
         if (entity != null) {
-            player.eject();
+            player.leaveVehicle();
             entity.remove();
         }
 
