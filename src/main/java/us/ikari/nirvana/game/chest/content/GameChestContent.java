@@ -1,5 +1,6 @@
 package us.ikari.nirvana.game.chest.content;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -13,6 +14,27 @@ public interface GameChestContent {
 
         for (ItemStack itemStack : content.getItems()) {
             if (itemStack.getType().name().contains("CHESTPLATE") || itemStack.getType().name().contains("LEGGINGS") || itemStack.getType().name().contains("BOOTS") || itemStack.getType().name().contains("HELMET")) {
+                toReturn.add(itemStack);
+            }
+        }
+
+        return toReturn;
+    }
+
+    static boolean containsItemByType(Player player, String type) {
+        for (ItemStack itemStack : player.getInventory().getContents()) {
+            if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static List<ItemStack> getItemsByType(GameChestContent content, String type) {
+        List<ItemStack> toReturn = new ArrayList<>();
+
+        for (ItemStack itemStack : content.getItems()) {
+            if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
                 toReturn.add(itemStack);
             }
         }

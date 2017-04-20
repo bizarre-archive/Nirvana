@@ -43,17 +43,9 @@ public class BasicGameChestContent implements GameChestContent {
 
         toReturn.add(new ItemStack(Material.GLOWSTONE_DUST, 4));
         toReturn.add(new ItemStack(Material.GLOWSTONE_DUST, 6));
-        toReturn.add(new ItemStack(Material.GLOWSTONE_DUST, 8));
-        toReturn.add(new ItemStack(Material.GLOWSTONE_DUST, 16));
-        toReturn.add(new ItemStack(Material.GLOWSTONE, 2));
-        toReturn.add(new ItemStack(Material.GLOWSTONE, 4));
-        toReturn.add(new ItemStack(Material.GLOWSTONE, 8));
 
         toReturn.add(new ItemStack(Material.SULPHUR, 2));
         toReturn.add(new ItemStack(Material.SULPHUR, 4));
-        toReturn.add(new ItemStack(Material.SULPHUR, 6));
-        toReturn.add(new ItemStack(Material.SULPHUR, 8));
-        toReturn.add(new ItemStack(Material.SULPHUR, 16));
 
         toReturn.add(new ItemStack(Material.FISHING_ROD));
         toReturn.add(new ItemStack(Material.BOW));
