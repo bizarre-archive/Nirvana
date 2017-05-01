@@ -27,7 +27,7 @@ public class GameChestListeners implements Listener {
 
                 outer: for (int i = 0; i < 4; i++) {
                     if (event.getPlayer().getInventory().getArmorContents()[i] == null) {
-                        if (new Random().nextInt(100) >= 50) {
+                        if (new Random().nextInt(2) == 1) {
                             List<ItemStack> potentialArmor = GameChestContent.getArmorFromSlot(GameChestContent.getArmor(chest.getContent()), i);
 
                             if (potentialArmor != null) {
@@ -40,14 +40,34 @@ public class GameChestListeners implements Listener {
 
                                 amount--;
 
+                                int attempts = 0;
                                 int index = new Random().nextInt(inventory.getSize());
-                                while (inventory.getItem(index) != null) {
+                                while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
                                     index = new Random().nextInt(inventory.getSize());
+                                    attempts++;
                                 }
+
 
                                 inventory.setItem(index, potentialArmor.get(new Random().nextInt(potentialArmor.size())));
                             }
                         }
+                    }
+                }
+
+                if (!(GameChestContent.containsItemByType((Player) event.getPlayer(), "FOOD"))) {
+                    if (new Random().nextInt(2) == 1) {
+                        amount--;
+                        List<ItemStack> items = GameChestContent.getItemsByType(chest.getContent(), "FOOD");
+
+                        int attempts = 0;
+                        int index = new Random().nextInt(inventory.getSize());
+                        while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
+                            index = new Random().nextInt(inventory.getSize());
+                            attempts++;
+                        }
+
+
+                        inventory.setItem(index, items.get(new Random().nextInt(items.size())));
                     }
                 }
 
@@ -56,10 +76,13 @@ public class GameChestListeners implements Listener {
                         List<ItemStack> items = GameChestContent.getItemsByType(chest.getContent(), "SWORD");
                         amount--;
 
+                        int attempts = 0;
                         int index = new Random().nextInt(inventory.getSize());
-                        while (inventory.getItem(index) != null) {
+                        while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
                             index = new Random().nextInt(inventory.getSize());
+                            attempts++;
                         }
+
 
                         inventory.setItem(index, items.get(new Random().nextInt(items.size())));
                     }
@@ -72,9 +95,11 @@ public class GameChestListeners implements Listener {
                         itemStack = chest.getContent().getItems().get(new Random().nextInt(chest.getContent().getItems().size()));
                     }
 
+                    int attempts = 0;
                     int index = new Random().nextInt(inventory.getSize());
-                    while (inventory.getItem(index) != null) {
+                    while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
                         index = new Random().nextInt(inventory.getSize());
+                        attempts++;
                     }
 
                     inventory.setItem(index, itemStack);

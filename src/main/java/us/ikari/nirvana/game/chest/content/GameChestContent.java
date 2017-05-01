@@ -1,5 +1,6 @@
 package us.ikari.nirvana.game.chest.content;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,8 +24,13 @@ public interface GameChestContent {
 
     static boolean containsItemByType(Player player, String type) {
         for (ItemStack itemStack : player.getInventory().getContents()) {
-            if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
-                return true;
+            if (itemStack != null) {
+                if (type.equalsIgnoreCase("FOOD") && itemStack.getType().isEdible()) {
+                    return true;
+                }
+                if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -34,8 +40,13 @@ public interface GameChestContent {
         List<ItemStack> toReturn = new ArrayList<>();
 
         for (ItemStack itemStack : content.getItems()) {
-            if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
-                toReturn.add(itemStack);
+            if (itemStack != null) {
+                if (type.equalsIgnoreCase("FOOD") && itemStack.getType().isEdible()) {
+                    toReturn.add(itemStack);
+                }
+                if (itemStack.getType().name().toUpperCase().contains(type.toUpperCase())) {
+                    toReturn.add(itemStack);
+                }
             }
         }
 

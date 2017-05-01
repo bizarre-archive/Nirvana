@@ -51,21 +51,29 @@ public class GameStartTask extends BukkitRunnable {
             Player player = Bukkit.getPlayer(gamePlayer.getUuid());
 
             if (player != null) {
-                player.getInventory().clear();
-
-                Entity vehicle = player.getVehicle();
-                if (vehicle != null) {
-                    player.leaveVehicle();
-                    vehicle.remove();
+                if (gamePlayer.getData().alive()) {
+                    player.getInventory().clear();
                 }
 
-                GameKit kit = gamePlayer.getData().kit();
-                if (kit != null) {
-                    ItemStack[] armor = kit.getArmor();
-                    ArrayUtils.reverse(armor);
+                for (String message : Nirvana.getInstance().getLangFile().getStringList("GAME.START", LanguageConfigurationFileLocale.EXPLICIT)) {
+                    player.sendMessage(message);
+                }
 
-                    player.getInventory().addItem(kit.getContents());
-                    player.getInventory().setArmorContents(armor);
+                if (gamePlayer.getData().alive()) {
+                    Entity vehicle = player.getVehicle();
+                    if (vehicle != null) {
+                        player.leaveVehicle();
+                        vehicle.remove();
+                    }
+
+                    GameKit kit = gamePlayer.getData().kit();
+                    if (kit != null) {
+                        ItemStack[] armor = kit.getArmor();
+                        ArrayUtils.reverse(armor);
+
+                        player.getInventory().addItem(kit.getContents());
+                        player.getInventory().setArmorContents(armor);
+                    }
                 }
             }
 

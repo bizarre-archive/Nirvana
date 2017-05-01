@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.Game;
+import us.ikari.nirvana.game.GameState;
 import us.ikari.nirvana.game.kit.menu.GameSpectatorMenu;
 import us.ikari.nirvana.game.player.GamePlayer;
 
@@ -48,7 +49,7 @@ public class GameSpectatorListeners implements Listener {
             event.setCancelled(true);
 
             for (GamePlayer other : game.getPlayers()) {
-                if (other.getData().spectator() != null) {
+                if (other.getData().spectator() != null || game.getState() == GameState.END) {
                     Player otherPlayer = Bukkit.getPlayer(other.getUuid());
                     if (otherPlayer != null) {
                         otherPlayer.sendMessage(ChatColor.GRAY + player.getName() + ": " + event.getMessage());

@@ -14,7 +14,7 @@ public class BomberGameKit extends PowerfulGameKit {
 
     @Override
     public ItemStack[] getContents() {
-        return new ItemStack[]{new MenuItemBuilder(Material.TNT).amount(24).build().getItemStack(), new MenuItemBuilder(Material.WOOD_PLATE).amount(6).build().getItemStack(), new MenuItemBuilder(Material.WATER_BUCKET).build().getItemStack()};
+        return new ItemStack[]{new MenuItemBuilder(Material.TNT).amount(16).build().getItemStack(), new MenuItemBuilder(Material.WOOD_PLATE).amount(6).build().getItemStack(), new MenuItemBuilder(Material.WATER_BUCKET).build().getItemStack()};
     }
 
     @Override

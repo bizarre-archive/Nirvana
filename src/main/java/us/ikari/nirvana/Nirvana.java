@@ -11,20 +11,25 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import us.ikari.azazel.Azazel;
+import us.ikari.azazel.tab.example.ExampleTabAdapter;
 import us.ikari.nirvana.game.Game;
 import us.ikari.nirvana.game.GameChunkGenerator;
 import us.ikari.nirvana.game.GameListeners;
 import us.ikari.nirvana.game.GameLoader;
 import us.ikari.nirvana.game.board.GameBoardAdapter;
 import us.ikari.nirvana.game.chest.GameChestListeners;
+import us.ikari.nirvana.game.kit.ability.GameKitAbilityListeners;
 import us.ikari.nirvana.game.player.GamePlayerListeners;
 import us.ikari.nirvana.game.spectator.GameSpectatorListeners;
+import us.ikari.nirvana.game.tab.GameTabAdapter;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
 import us.ikari.phoenix.scoreboard.Aether;
+import us.ikari.phoenix.scoreboard.AetherOptions;
 
 public class Nirvana extends JavaPlugin implements Listener {
 
@@ -67,12 +72,16 @@ public class Nirvana extends JavaPlugin implements Listener {
         if (this.game == null) {
             this.game = game;
             registerListeners();
+
+            new Azazel(this, new GameTabAdapter(this));
+
             registerBoard();
         }
     }
 
+
     private void registerBoard() {
-        new Aether(this, new GameBoardAdapter(this));
+        new Aether(this, new GameBoardAdapter(this), new AetherOptions().hook(true));
     }
 
     private void registerListeners() {
@@ -83,6 +92,7 @@ public class Nirvana extends JavaPlugin implements Listener {
         pluginManager.registerEvents(game.getLobby().getListeners(), this);
         pluginManager.registerEvents(new GameChestListeners(), this);
         pluginManager.registerEvents(new GameSpectatorListeners(this), this);
+        pluginManager.registerEvents(new GameKitAbilityListeners(this), this);
     }
 
     @Override

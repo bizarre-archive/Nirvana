@@ -55,16 +55,21 @@ public class GameLobbyListeners implements Listener {
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        event.setJoinMessage(null);
-
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            online.sendMessage(main.getLangFile().getString("LOBBY.JOIN", LanguageConfigurationFileLocale.EXPLICIT, player.getDisplayName(), game.getPlayers().size(), game.getLobby().getSpawnLocations().size()));
-        }
-
-        game.getLobby().prepare(player);
-
         GamePlayer gamePlayer = game.getByPlayer(player);
         if (gamePlayer != null) {
+
+            event.setJoinMessage(null);
+
+            if (!gamePlayer.getData().alive()) {
+                return;
+            }
+
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.sendMessage(main.getLangFile().getString("LOBBY.JOIN", LanguageConfigurationFileLocale.EXPLICIT, player.getDisplayName(), game.getPlayers().size(), game.getLobby().getSpawnLocations().size()));
+            }
+
+            game.getLobby().prepare(player);
+
             for (Location location : game.getLobby().getSpawnLocations()) {
                 if (game.getBySpawnLocation(location) == null) {
                     player.teleport(location);

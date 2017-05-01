@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 public enum GameChest {
-    BASIC(0, new BasicGameChestContent(), 8, 12),
-    BUFFED(1, new BuffedGameChestContent(), 8, 12),
+    BASIC(0, new BasicGameChestContent(), 4, 8),
+    BUFFED(1, new BuffedGameChestContent(), 4, 8),
     OP(2, new OverPoweredGameChestContent(), 4, 8);
 
     private static Set<Chest> loadedChests = new HashSet<>();

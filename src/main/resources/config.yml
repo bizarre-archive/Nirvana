@@ -2,7 +2,7 @@ REDIS:
   HOST: localhost
 STATE:
   LOBBY:
-    COUNTDOWN: 20000
+    COUNTDOWN: 35000
   EVENT:
     FIRST_REFILL:
       START: 0

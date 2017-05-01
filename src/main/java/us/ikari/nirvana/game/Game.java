@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.kit.GameKit;
-import us.ikari.nirvana.game.kit.type.BomberGameKit;
-import us.ikari.nirvana.game.kit.type.DefaultGameKit;
-import us.ikari.nirvana.game.kit.type.TrapperGameKit;
+import us.ikari.nirvana.game.kit.type.*;
 import us.ikari.nirvana.game.lobby.GameLobby;
 import us.ikari.nirvana.game.player.GamePlayer;
 import us.ikari.nirvana.game.task.GameStartTask;
@@ -47,6 +45,12 @@ public class Game {
         kits.add(new DefaultGameKit());
         kits.add(new BomberGameKit());
         kits.add(new TrapperGameKit());
+        kits.add(new MinerGameKit());
+        kits.add(new GhostGameKit());
+        kits.add(new MerchantGameKit());
+        kits.add(new RusherGameKit());
+        kits.add(new GeneratorGameKit());
+        kits.add(new EndermanGameKit());
     }
 
     public List<GamePlayer> getAlivePlayers() {
@@ -81,7 +85,7 @@ public class Game {
                         }
                         Bukkit.getServer().shutdown();
                     }
-                }.runTaskLater(Nirvana.getInstance(), 600);
+                }.runTaskLater(Nirvana.getInstance(), 300);
             }
         }
     }
@@ -127,7 +131,7 @@ public class Game {
     }
 
     public boolean hasEnoughPlayers() {
-        return state == GameState.LOBBY && players.size() >= 3;
+        return state == GameState.LOBBY && players.size() >= (lobby.getSpawnLocations().size() / 2);
     }
 
 }

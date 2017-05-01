@@ -15,6 +15,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.chest.GameChest;
 
@@ -26,15 +29,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class GameLoader {
+public class GameLoader implements Listener {
 
     private Nirvana main;
     private final List<Location> spawnLocations;
     private String map;
+    private int height;
 
     public GameLoader(Nirvana main) {
         this.spawnLocations = new ArrayList<>();
         this.map = "N/A";
+
+        Bukkit.getPluginManager().registerEvents(this, main);
 
         File folder = new File(main.getDataFolder() + File.separator + "schematics");
         if (!folder.exists()) {
@@ -62,7 +68,7 @@ public class GameLoader {
         try {
             file = files.get(new Random().nextInt(files.size()));
             System.out.println("Loading " + file.getPath() + "...");
-            clipboard = CuboidClipboard.loadSchematic(files.get(new Random().nextInt(files.size())));
+            clipboard = CuboidClipboard.loadSchematic(file);
             System.out.println("Loaded " + file.getPath() + "!");
             map = FilenameUtils.removeExtension(file.getName());
         } catch (DataException e) {
@@ -119,9 +125,18 @@ public class GameLoader {
             }
         }
 
+        height = clipboard.getHeight() + location.getWorld().getSpawnLocation().getBlockY();
+
         System.out.println("Pasted " + file.getPath() + "!");
 
         this.main = main;
+    }
+
+    @EventHandler
+    public void onBlockPlaceEvent(BlockPlaceEvent event) {
+        if (event.getBlock().getLocation().getBlockY() >= height && height > 0) {
+            event.setCancelled(true);
+        }
     }
 
     public Game getGame() {

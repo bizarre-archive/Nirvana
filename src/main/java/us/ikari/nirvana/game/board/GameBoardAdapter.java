@@ -8,6 +8,7 @@ import us.ikari.nirvana.Nirvana;
 import us.ikari.nirvana.game.Game;
 import us.ikari.nirvana.game.GameEventStage;
 import us.ikari.nirvana.game.GameState;
+import us.ikari.nirvana.game.player.GamePlayer;
 import us.ikari.nirvana.game.task.GameStartTask;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFileLocale;
 import us.ikari.phoenix.scoreboard.scoreboard.Board;
@@ -37,7 +38,8 @@ public class GameBoardAdapter implements BoardAdapter {
     public List<String> getScoreboard(Player player, Board board, Set<BoardCooldown> set) {
 
         if (game.getState() == GameState.LOBBY) {
-            return main.getLangFile().getStringList("SCOREBOARD." + (game.hasTask(GameStartTask.class) ? "LOBBY" : "LOBBY_WAITING"), LanguageConfigurationFileLocale.EXPLICIT, game.getAlivePlayers().size(), game.getLobby().getSpawnLocations().size(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1, "SW-1"); //TODO Change last param
+            GamePlayer gamePlayer = game.getByPlayer(player);
+            return main.getLangFile().getStringListWithArgumentsOrRemove("SCOREBOARD." + (game.hasTask(GameStartTask.class) ? "LOBBY" : "LOBBY_WAITING"), LanguageConfigurationFileLocale.EXPLICIT, game.getAlivePlayers().size(), game.getLobby().getSpawnLocations().size(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1, "SW-1", (gamePlayer != null ? (gamePlayer.getData().kit() != null ? main.getLangFile().getString("KIT." + gamePlayer.getData().kit().getIdentifier().toUpperCase() + ".NAME", LanguageConfigurationFileLocale.EXPLICIT) : null) : null)); //TODO Change last param
         }
 
         if (game.getState() == GameState.PLAY) {
