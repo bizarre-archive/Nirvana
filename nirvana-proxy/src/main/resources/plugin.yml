@@ -1,0 +1,5 @@
+main: com.veltpvp.nirvana.proxy.Nirvana
+name: ${project.name}
+description: ${project.description}
+version: ${project.version}
+author: BizarreAlex

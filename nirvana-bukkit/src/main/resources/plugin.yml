@@ -1,4 +1,4 @@
-main: com.veltpvp.nirvana.Nirvana
+main: com.veltpvp.nirvana.bukkit.Nirvana
 name: ${project.name}
 description: ${project.description}
 version: ${project.version}

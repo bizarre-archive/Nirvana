@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.veltpvp</groupId>
+    <groupId>com.veltpvp.nirvana</groupId>
     <packaging>pom</packaging>
     <name>Nirvana</name>
     <artifactId>Nirvana</artifactId>
@@ -13,6 +13,9 @@
 
     <modules>
         <module>nirvana-bukkit</module>
+        <module>nirvana-hub</module>
+        <module>nirvana-packet</module>
+        <module>nirvana-proxy</module>
     </modules>
 
 
