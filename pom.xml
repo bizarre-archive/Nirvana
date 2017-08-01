@@ -12,10 +12,11 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>nirvana-bukkit</module>
+        <module>nirvana-game</module>
         <module>nirvana-hub</module>
         <module>nirvana-packet</module>
         <module>nirvana-proxy</module>
+        <module>nirvana-lobby</module>
     </modules>
 
 
