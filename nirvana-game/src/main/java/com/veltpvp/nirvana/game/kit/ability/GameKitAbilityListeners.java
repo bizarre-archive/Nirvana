@@ -5,6 +5,7 @@ import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.kit.GameKit;
 import com.veltpvp.nirvana.game.kit.PowerfulGameKit;
 import com.veltpvp.nirvana.game.player.GamePlayer;
+import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -31,6 +32,7 @@ public class GameKitAbilityListeners implements Listener {
         if (killer != null) {
             GamePlayer gamePlayer = game.getByPlayer(killer);
             if (gamePlayer != null) {
+                gamePlayer.getData().kills(gamePlayer.getData().kills() + 1);
                 GameKit kit = gamePlayer.getData().kit();
                 if (kit != null && kit instanceof PowerfulGameKit) {
                     PowerfulGameKit powerfulGameKit = (PowerfulGameKit) kit;
@@ -47,7 +49,7 @@ public class GameKitAbilityListeners implements Listener {
             GameKit kit = gamePlayer.getData().kit();
             if (kit != null && kit instanceof PowerfulGameKit) {
                 PowerfulGameKit powerfulGameKit = (PowerfulGameKit) kit;
-                if (powerfulGameKit.getAbilities().contains(GameKitAbility.EXPLODE_ON_DEATH)) {
+                if (powerfulGameKit.getAbilities().contains(GameKitAbility.EXPLODE_ON_DEATH) && main.getLocalNirvanaServer().getType() != NirvanaServerType.UHC) {
                     TNTPrimed tnt = player.getWorld().spawn(player.getLocation(), TNTPrimed.class);
                     tnt.setFuseTicks(40);
                 }

@@ -5,6 +5,5 @@ public enum NirvanaServerStatus {
     DEPLOYING,
     WAITING_FOR_PLAYERS,
     STARTING,
-    FULL,
     IN_GAME
 }

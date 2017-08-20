@@ -57,7 +57,11 @@ public class GameStartTask extends BukkitRunnable {
         game.setState(GameState.PLAY);
         game.getGameTime().reset();
 
-        Nirvana.getInstance().getLocalNirvanaServer().setStatus(NirvanaServerStatus.IN_GAME);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.closeInventory();
+        }
+
+        Nirvana.getInstance().setNetworkStatus(NirvanaServerStatus.IN_GAME);
 
         for (GamePlayer gamePlayer : game.getPlayers()) {
             Player player = Bukkit.getPlayer(gamePlayer.getUuid());
@@ -102,11 +106,11 @@ public class GameStartTask extends BukkitRunnable {
                            GameChest.getLoadedChests().clear();
                            if (stage == GameEventStage.SECOND_REFILL) {
 
-                               for (Location chest : GameChest.BASIC.getInstances()) {
+                              /* for (Location chest : GameChest.BASIC.getInstances()) {
                                    GameChest.BUFFED.getInstances().add(chest);
-                               }
+                               } TODO
 
-                               GameChest.BASIC.getInstances().clear();
+                               GameChest.BASIC.getInstances().clear();*/
                            }
 
                            for (Player player : Bukkit.getOnlinePlayers()) {

@@ -3,10 +3,12 @@ package com.veltpvp.nirvana.game.board;
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.game.GameEventStage;
 import com.veltpvp.nirvana.game.GameState;
+import com.veltpvp.nirvana.game.chest.GameChest;
 import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.game.Game;
 import net.minecraft.util.org.apache.commons.lang3.time.DateFormatUtils;
 import net.minecraft.util.org.apache.commons.lang3.time.DurationFormatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import com.veltpvp.nirvana.game.task.GameStartTask;
@@ -39,12 +41,12 @@ public class GameBoardAdapter implements BoardAdapter {
 
         if (game.getState() == GameState.LOBBY) {
             GamePlayer gamePlayer = game.getByPlayer(player);
-            return main.getLangFile().getStringListWithArgumentsOrRemove("SCOREBOARD." + (game.hasTask(GameStartTask.class) ? "LOBBY" : "LOBBY_WAITING"), LanguageConfigurationFileLocale.ENGLISH, game.getAlivePlayers().size(), game.getLobby().getSpawnLocations().size(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1, "SW-1", (gamePlayer != null ? (gamePlayer.getData().kit() != null ? main.getLangFile().getString("KIT." + gamePlayer.getData().kit().getIdentifier().toUpperCase() + ".NAME", LanguageConfigurationFileLocale.ENGLISH) : null) : null)); //TODO Change last param
+            return main.getLangFile().getStringListWithArgumentsOrRemove("SCOREBOARD." + (game.hasTask(GameStartTask.class) ? "LOBBY" : "LOBBY_WAITING"), LanguageConfigurationFileLocale.ENGLISH, game.getAlivePlayers().size(), game.getLobby().getSpawnLocations().size(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1, Bukkit.getServerName(), (gamePlayer != null ? (gamePlayer.getData().kit() != null ? main.getLangFile().getString("KIT." + gamePlayer.getData().kit().getIdentifier().toUpperCase() + ".NAME", LanguageConfigurationFileLocale.ENGLISH) : null) : null), GameChest.getCurrent().getName()); //TODO Change last param
         }
 
         if (game.getState() == GameState.PLAY) {
             int event = (int) (GameEventStage.getActiveCountdown(game));
-            return main.getLangFile().getStringList("SCOREBOARD." + (event == 0 ? "GAME" : (game.getRefillStage() == GameEventStage.SECOND_REFILL || game.getRefillStage() == GameEventStage.DEATHMATCH ? "EVENT_DEATHMATCH" : "EVENT_REFILL")), LanguageConfigurationFileLocale.ENGLISH, DateFormatUtils.format(new Date(), "MM/dd/yyyy"), event >= 60000 ? DurationFormatUtils.formatDuration(event + 1000, "mm:ss") : ((event + 1000) / 1000) + "s", game.getAlivePlayers().size(), player.getStatistic(Statistic.PLAYER_KILLS), game.getMap());
+            return main.getLangFile().getStringList("SCOREBOARD." + (event == 0 ? "GAME" : (game.getRefillStage() == GameEventStage.SECOND_REFILL || game.getRefillStage() == GameEventStage.DEATHMATCH ? "EVENT_DEATHMATCH" : "EVENT_REFILL")), LanguageConfigurationFileLocale.ENGLISH, DateFormatUtils.format(new Date(), "MM/dd/yyyy"), event >= 60000 ? DurationFormatUtils.formatDuration(event + 1000, "mm:ss") : ((event + 1000) / 1000) + "s", game.getAlivePlayers().size(), player.getStatistic(Statistic.PLAYER_KILLS), game.getMap(), GameChest.getCurrent().getName());
         }
 
         return null;

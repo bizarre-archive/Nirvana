@@ -1,5 +1,7 @@
 package com.veltpvp.nirvana.game.spectator;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.veltpvp.nirvana.game.GameState;
 import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.game.kit.menu.GameSpectatorMenu;
@@ -80,6 +82,10 @@ public class GameSpectatorListeners implements Listener {
         if (gamePlayer != null && gamePlayer.getData().spectator() != null) {
             event.setCancelled(true);
 
+            if (event.getClickedBlock() != null) {
+                event.getClickedBlock().getState().update();
+            }
+
             ItemStack itemStack = event.getItem();
 
             if (itemStack != null) {
@@ -90,7 +96,15 @@ public class GameSpectatorListeners implements Listener {
                 }
 
                 if (itemStack.getType() == Material.INK_SACK) {
-                    player.kickPlayer("");
+                    if (!(gamePlayer.getData().sending())) {
+                        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                        out.writeUTF("sendToNirvanaLobby");
+                        out.writeInt(1);
+                        out.writeUTF(player.getName());
+
+                        player.sendPluginMessage(Nirvana.getInstance(), "BungeeCord", out.toByteArray());
+                        gamePlayer.getData().sending(true);
+                    }
                 }
 
             }

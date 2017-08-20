@@ -1,5 +1,7 @@
 package com.veltpvp.nirvana.game;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.game.kit.GameKit;
 import com.veltpvp.nirvana.game.kit.type.*;
@@ -71,6 +73,13 @@ public class Game {
                 state = GameState.END;
 
                 Player winner = Bukkit.getPlayer(getAlivePlayers().get(0).getName());
+                getAlivePlayers().get(0).getData().won(true);
+
+
+                for (GamePlayer gamePlayer : getPlayers()) {
+                    gamePlayer.save();
+                }
+
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     for (String message : Nirvana.getInstance().getLangFile().getStringList("GAME.WON", LanguageConfigurationFileLocale.ENGLISH, winner.getDisplayName(), winner.getDisplayName())) {
                         player.sendMessage(message);
@@ -81,11 +90,39 @@ public class Game {
                     @Override
                     public void run() {
                         for (Player player : Bukkit.getOnlinePlayers()) {
+                            ByteArrayDataOutput out = ByteStreams.newDataOutput();
+                            out.writeUTF("sendToNirvanaLobby");
+                            out.writeInt(1);
+                            out.writeUTF(player.getName());
+
+                            player.sendPluginMessage(Nirvana.getInstance(), "BungeeCord", out.toByteArray());
+                        }
+                    }
+                }.runTaskLater(Nirvana.getInstance(), 100);
+
+                new Thread() {
+                    @Override
+                    public void run() {
+                        while (Bukkit.getOnlinePlayers().size() > 0) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Bukkit.shutdown();
+                    }
+                }.start();
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        for (Player player : Bukkit.getOnlinePlayers()) {
                             player.kickPlayer(Nirvana.getInstance().getLangFile().getString("GAME.GAME_OVER", LanguageConfigurationFileLocale.ENGLISH, winner.getDisplayName()));
                         }
-                        Bukkit.getServer().shutdown();
                     }
-                }.runTaskLater(Nirvana.getInstance(), 300);
+                }.runTaskLater(Nirvana.getInstance(), 500);
             }
         }
     }

@@ -1,5 +1,6 @@
-main: com.veltpvp.nirvana.lobby.Nirvana
+main: com.veltpvp.nirvana.Nirvana
 name: ${project.name}
 description: ${project.description}
 version: ${project.version}
 author: BizarreAlex
+load: STARTUP

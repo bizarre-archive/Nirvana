@@ -5,6 +5,7 @@ import com.veltpvp.nirvana.game.GameState;
 import com.veltpvp.nirvana.game.GameUtils;
 import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
+import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import net.minecraft.server.v1_7_R4.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,10 +72,6 @@ public class GameLobbyListeners implements Listener {
                 online.sendMessage(main.getLangFile().getString("LOBBY.JOIN", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), game.getPlayers().size(), game.getLobby().getSpawnLocations().size()));
             }
 
-            if (game.getState() == GameState.LOBBY && game.getLobby().getSpawnLocations().size() == game.getPlayers().size()) {
-                main.setNetworkStatus(NirvanaServerStatus.FULL);
-            }
-
             game.getLobby().prepare(player);
 
             for (Location location : game.getLobby().getSpawnLocations()) {
@@ -139,8 +136,9 @@ public class GameLobbyListeners implements Listener {
             online.sendMessage(main.getLangFile().getString("LOBBY.QUIT", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), game.getPlayers().size() - 1, game.getLobby().getSpawnLocations().size()));
         }
 
-        if (main.getLocalNirvanaServer().getStatus() == NirvanaServerStatus.FULL) {
-            main.setNetworkStatus(NirvanaServerStatus.WAITING_FOR_PLAYERS);
+        if (Bukkit.getOnlinePlayers().size() - 1 == 0 && main.getLocalNirvanaServer().getType() != NirvanaServerType.PENDING) {
+            main.getLocalNirvanaServer().setType(NirvanaServerType.PENDING);
+            main.setNetworkStatus(main.getLocalNirvanaServer().getStatus());
         }
 
         org.bukkit.entity.Entity entity = player.getVehicle();

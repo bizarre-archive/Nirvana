@@ -1,52 +1,69 @@
 package com.veltpvp.nirvana.game.chest;
 
-import com.veltpvp.nirvana.game.chest.content.ConfigurableGameChestContent;
+import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.chest.content.ClassicGameChestContent;
 import com.veltpvp.nirvana.game.chest.content.GameChestContent;
+import com.veltpvp.nirvana.game.chest.content.PotPvPGameChestContent;
+import com.veltpvp.nirvana.game.chest.content.UHCGameChestContent;
 import lombok.Getter;
+import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public enum GameChest {
-    BASIC(0, new ConfigurableGameChestContent(), 4, 8),
-    BUFFED(1, new ConfigurableGameChestContent(), 4, 8),
-    OP(2, new ConfigurableGameChestContent(), 4, 8);
+    POTPVP(new PotPvPGameChestContent(), "PotPvP"),
+    CLASSIC(new ClassicGameChestContent(), "Classic"),
+    UHC(new UHCGameChestContent(), "UHC");
 
     private static Set<Chest> loadedChests = new HashSet<>();
 
-    @Getter private final int identifier;
     @Getter private final GameChestContent content;
-    @Getter private final List<Location> instances;
-    @Getter private final int min, max;
+    @Getter private final String name;
+    @Getter @Setter private List<Map.Entry<Location, GameChestTier>> instances;
 
-    GameChest(int identifier, GameChestContent content, int min, int max) {
-        this.identifier = identifier;
+    GameChest(GameChestContent content, String name) {
         this.content = content;
-        this.min = min;
-        this.max = max;
+        this.name = name;
         this.instances = new ArrayList<>();
     }
 
-    public static GameChest getByIdentifier(int identifier) {
-        for (GameChest chest : values()) {
-            if (chest.getIdentifier() == identifier) {
-                return chest;
-            }
+    public static GameChest getCurrent() {
+        GameChest chest;
+
+        try {
+            chest = GameChest.valueOf(Nirvana.getInstance().getLocalNirvanaServer().getType().name());
+        } catch (Exception exception) {
+            chest = POTPVP;
         }
-        return BASIC;
+
+        return chest;
     }
 
-    public static GameChest getByBlock(Block block) {
+    public static Map.Entry<GameChest, GameChestTier> getByBlock(Block block) {
+
         if (block.getState() instanceof Chest) {
-            for (GameChest chest : values()) {
-                if (chest.getInstances().contains(block.getLocation()) && !loadedChests.contains(block.getState())) {
-                    return chest;
-                }
+            GameChest chest;
+            try {
+                chest = GameChest.valueOf(Nirvana.getInstance().getLocalNirvanaServer().getType().name());
+            } catch (Exception ex) {
+                chest = POTPVP;
+            }
+
+            return getPairByLocation(chest, block.getLocation());
+        }
+
+
+        return null;
+    }
+
+    private static Map.Entry<GameChest, GameChestTier> getPairByLocation(GameChest chest, Location location) {
+        for (Map.Entry<Location, GameChestTier> pair : chest.getInstances()) {
+            if (pair.getKey().distance(location) <= 1) {
+                return new AbstractMap.SimpleEntry<>(chest, pair.getValue());
             }
         }
         return null;

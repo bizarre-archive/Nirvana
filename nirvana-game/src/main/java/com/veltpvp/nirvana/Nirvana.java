@@ -6,13 +6,15 @@ import com.veltpvp.nirvana.game.GameListeners;
 import com.veltpvp.nirvana.game.GameLoader;
 import com.veltpvp.nirvana.game.board.GameBoardAdapter;
 import com.veltpvp.nirvana.game.packet.GamePacketListeners;
+import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.game.player.GamePlayerListeners;
 import com.veltpvp.nirvana.game.spectator.GameSpectatorListeners;
 import com.veltpvp.nirvana.game.kit.ability.GameKitAbilityListeners;
 import com.veltpvp.nirvana.packet.NirvanaChannels;
-import com.veltpvp.nirvana.packet.ServerStatusPacket;
+import com.veltpvp.nirvana.packet.ServerInfoPacket;
 import com.veltpvp.nirvana.packet.server.NirvanaServer;
 import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
+import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -48,7 +50,10 @@ public class Nirvana extends JavaPlugin implements Listener {
     @Getter private BasicConfigurationFile configFile;
     @Getter private LanguageConfigurationFile langFile;
     @Getter private PhoenixGui phoenixGui;
+    @Getter private NirvanaDatabase mongo;
     @Getter private Game game;
+
+    //TODO: Change bukkit.getservername call to configuration defined var
 
     @Override
     public void onEnable() {
@@ -56,11 +61,14 @@ public class Nirvana extends JavaPlugin implements Listener {
 
         configFile = new BasicConfigurationFile(this, "config", true);
         langFile = new LanguageConfigurationFile(this, "lang", true);
-        network = new RedisNetwork(new RedisNetworkConfiguration(configFile.getStringOrDefault("REDIS.HOST", "localhost")));
+        network = new RedisNetwork(new RedisNetworkConfiguration(configFile.getStringOrDefault("REDIS.HOST", "localhost")), ServerInfoPacket.class.getClassLoader());
         phoenixGui = new PhoenixGui(this);
+        mongo = new NirvanaDatabase(this);
 
-        NIRVANA_SERVER.setType(configFile.getString("TYPE"));
+        NIRVANA_SERVER.setType(NirvanaServerType.PENDING);
         setNetworkStatus(NirvanaServerStatus.DEPLOYING);
+
+        Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         new GamePacketListeners();
 
@@ -72,6 +80,7 @@ public class Nirvana extends JavaPlugin implements Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.eject();
         }
+
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
                 if (entity instanceof Player) {
@@ -82,6 +91,8 @@ public class Nirvana extends JavaPlugin implements Listener {
         }
 
         setNetworkStatus(NirvanaServerStatus.OFFLINE);
+
+        network.shutdown();
      }
 
     public void setGame(Game game) {
@@ -103,10 +114,12 @@ public class Nirvana extends JavaPlugin implements Listener {
 
     public void setNetworkStatus(NirvanaServerStatus status) {
         NIRVANA_SERVER.setStatus(status);
+        NIRVANA_SERVER.setPlayers(Bukkit.getOnlinePlayers().size());
+        NIRVANA_SERVER.setMaxPlayers(Bukkit.getMaxPlayers());
 
         System.out.println("Server status set to " + status.name());
 
-        network.sendPacket(new ServerStatusPacket(NIRVANA_SERVER), NirvanaChannels.APPLICATION_CHANNEL, PacketDeliveryMethod.DIRECT);
+        network.sendPacket(new ServerInfoPacket(NIRVANA_SERVER), NirvanaChannels.APPLICATION_CHANNEL, PacketDeliveryMethod.DIRECT);
     }
 
     private void registerBoard() {

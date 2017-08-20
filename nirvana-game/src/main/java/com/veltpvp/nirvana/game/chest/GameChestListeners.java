@@ -1,6 +1,8 @@
 package com.veltpvp.nirvana.game.chest;
 
+import com.veltpvp.nirvana.game.GameUtils;
 import com.veltpvp.nirvana.game.chest.content.GameChestContent;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,100 +12,96 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GameChestListeners implements Listener {
 
+    private static final Random RANDOM = new Random();
+
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpenEvent(InventoryOpenEvent event) {
+        Player player = (Player) event.getPlayer();
         Inventory inventory = event.getInventory();
         InventoryHolder holder = inventory.getHolder();
         if (holder instanceof Chest) {
-            GameChest chest = GameChest.getByBlock(((Chest) holder).getBlock());
-            if (chest != null) {
+            Inventory chestInventory = ((Chest) holder).getBlockInventory();
 
-                int amount = new Random().nextInt(chest.getMax() - chest.getMin()) + chest.getMin();
+            if (GameChest.getLoadedChests().contains(holder)) {
+                return;
+            }
 
-                outer: for (int i = 0; i < 4; i++) {
-                    if (event.getPlayer().getInventory().getArmorContents()[i] == null) {
-                        if (new Random().nextInt(2) == 1) {
-                            List<ItemStack> potentialArmor = GameChestContent.getArmorFromSlot(GameChestContent.getArmor(chest.getContent()), i);
+            Map.Entry<GameChest, GameChestTier> chestInformation = GameChest.getByBlock(((Chest) holder).getBlock());
 
-                            if (potentialArmor != null) {
+            System.out.println(chestInformation == null);
+            for (GameChest chest : GameChest.values()) {
+                System.out.println(chest.name() + ":" + chest.getInstances().size());
+            }
 
-                                for (ItemStack itemStack : potentialArmor) {
-                                    if (event.getPlayer().getInventory().contains(itemStack)) {
-                                        break outer;
-                                    }
-                                }
+            if (chestInformation != null) {
+                GameChest chest = chestInformation.getKey();
+                GameChestTier tier = chestInformation.getValue();
+                List<ItemStack> armorItems = chest.getContent().getArmor(tier);
+                List<ItemStack> weapons = chest.getContent().getWeapons(tier);
 
-                                amount--;
-
-                                int attempts = 0;
-                                int index = new Random().nextInt(inventory.getSize());
-                                while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
-                                    index = new Random().nextInt(inventory.getSize());
-                                    attempts++;
-                                }
-
-
-                                inventory.setItem(index, potentialArmor.get(new Random().nextInt(potentialArmor.size())));
-                            }
-                        }
-                    }
+                if (tier == null) {
+                    tier = GameChestTier.BASIC;
                 }
 
-                if (!(GameChestContent.containsItemByType((Player) event.getPlayer(), "FOOD"))) {
-                    if (new Random().nextInt(2) == 1) {
-                        amount--;
-                        List<ItemStack> items = GameChestContent.getItemsByType(chest.getContent(), "FOOD");
-
-                        int attempts = 0;
-                        int index = new Random().nextInt(inventory.getSize());
-                        while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
-                            index = new Random().nextInt(inventory.getSize());
-                            attempts++;
-                        }
-
-
-                        inventory.setItem(index, items.get(new Random().nextInt(items.size())));
-                    }
-                }
-
-                if (!(GameChestContent.containsItemByType((Player) event.getPlayer(), "SWORD"))) {
-                    if (new Random().nextInt(2) == 1) {
-                        List<ItemStack> items = GameChestContent.getItemsByType(chest.getContent(), "SWORD");
-                        amount--;
-
-                        int attempts = 0;
-                        int index = new Random().nextInt(inventory.getSize());
-                        while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
-                            index = new Random().nextInt(inventory.getSize());
-                            attempts++;
-                        }
-
-
-                        inventory.setItem(index, items.get(new Random().nextInt(items.size())));
-                    }
-                }
+                int amount = RANDOM.nextInt(4) + 4;
 
                 for (int i = 0; i < amount; i++) {
 
-                    ItemStack itemStack = chest.getContent().getItems().get(new Random().nextInt(chest.getContent().getItems().size()));
-                    while (event.getInventory().contains(itemStack)) {
-                        itemStack = chest.getContent().getItems().get(new Random().nextInt(chest.getContent().getItems().size()));
+                    for (int armor = 0; armor < RANDOM.nextInt(4); armor++) {
+                        boolean doLoop = GameChestUtils.hasFullArmor(player) ? RANDOM.nextInt(8 - (tier.getIdentifier()) * 2) == 1 : RANDOM.nextBoolean();
+
+                        if (doLoop) {
+                            Collections.shuffle(armorItems);
+                            ItemStack itemStack = GameChestUtils.getBetterArmorItem(player, armorItems, inventory);
+                            if (itemStack != null) {
+                                amount--;
+                                chestInventory.setItem(RANDOM.nextInt(chestInventory.getSize()), itemStack);
+                            }
+                        }
+
                     }
 
-                    int attempts = 0;
-                    int index = new Random().nextInt(inventory.getSize());
-                    while (inventory.getItem(index) != null && attempts <= inventory.getSize()) {
-                        index = new Random().nextInt(inventory.getSize());
-                        attempts++;
+                    ItemStack sword = GameChestUtils.getSword(player);
+                    if (sword == null) {
+                        Collections.shuffle(weapons);
+                        ItemStack itemStack = GameChestUtils.getBetterSword(player, weapons, inventory);
+                        if (itemStack != null) {
+                            chestInventory.setItem(RANDOM.nextInt(chestInventory.getSize()), itemStack);
+                            continue;
+                        }
+                    } else {
+                        if (RANDOM.nextInt(5 - (tier.getIdentifier())) == 1) {
+                            Collections.shuffle(weapons);
+                            ItemStack itemStack = GameChestUtils.getBetterSword(player, weapons, inventory);
+                            if (itemStack != null) {
+                                chestInventory.setItem(RANDOM.nextInt(chestInventory.getSize()), itemStack);
+                                continue;
+                            }
+                        }
                     }
 
-                    inventory.setItem(index, itemStack);
+                    if (!GameChestUtils.containsBlocks(inventory)) {
+                        if (RANDOM.nextBoolean()) {
+                            if (!chest.getContent().getBlocks(tier).isEmpty()) {
+                                inventory.setItem(RANDOM.nextInt(chestInventory.getSize()), chest.getContent().getBlocks(tier).get(RANDOM.nextInt(chest.getContent().getBlocks(tier).size())));
+                                continue;
+                            }
+                        }
+                    }
+
+                    ItemStack itemStack = chest.getContent().getItems(tier).get(RANDOM.nextInt(chest.getContent().getItems(tier).size()));
+                    if (!inventory.contains(itemStack)) {
+                        inventory.setItem(RANDOM.nextInt(chestInventory.getSize()), itemStack);
+                        continue;
+                    }
+
+                    i--;
                 }
+
 
                 GameChest.getLoadedChests().add((Chest) holder);
             }

@@ -7,6 +7,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
 import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.chest.GameChestTier;
 import net.minecraft.util.org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -24,10 +25,7 @@ import com.veltpvp.nirvana.game.chest.GameChest;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GameLoader implements Listener {
 
@@ -108,7 +106,13 @@ public class GameLoader implements Listener {
                             identifier = 0;
                         }
 
-                       GameChest.getByIdentifier(identifier).getInstances().add(block.getLocation());
+                        GameChest chest = GameChest.POTPVP;
+
+                        if (main.getLocalNirvanaServer().getType() != null) {
+                            try { chest = GameChest.valueOf(main.getLocalNirvanaServer().getType().name()); } catch (Exception ignored) {}
+                        }
+
+                       chest.getInstances().add(new AbstractMap.SimpleEntry<>(block.getLocation(), GameChestTier.getByIdentifier(identifier)));
                     }
 
                     sign.getBlock().setType(Material.AIR);
@@ -117,9 +121,15 @@ public class GameLoader implements Listener {
 
             for (BlockState state : chunk.getTileEntities()) {
                 if (state instanceof Chest) {
-                    GameChest chest = GameChest.getByBlock(state.getBlock());
-                    if (chest == null) {
-                        GameChest.BASIC.getInstances().add(state.getLocation());
+                    Map.Entry<GameChest, GameChestTier> info = GameChest.getByBlock(state.getBlock());
+                    if (info == null) {
+                        GameChest chest = GameChest.POTPVP;
+
+                        if (main.getLocalNirvanaServer().getType() != null) {
+                            try { chest = GameChest.valueOf(main.getLocalNirvanaServer().getType().name()); } catch (Exception ignored) {}
+                        }
+
+                        chest.getInstances().add(new AbstractMap.SimpleEntry<>(state.getLocation(), GameChestTier.BASIC));
                     }
                 }
             }

@@ -93,6 +93,7 @@ SCOREBOARD:
       - "&7Players:&f {0} / {1}"
       - "&7Server:&f {3}"
       - "&7Kit:&f {4}"
+      - "&7Gamemode:&f {5}"
       - "&r&r&r&r"
       - "&dwww.veltpvp.com&7 (Solo)"
       - "&7&m--------------------"
@@ -103,6 +104,7 @@ SCOREBOARD:
     - "&7Players: &f{0} / {1}"
     - "&7Server:&f {3}"
     - "&7Kit:&f {4}"
+    - "&7Gamemode:&f {5}"
     - "&r&r&r&r"
     - "&dwww.veltpvp.com&7 (Solo)"
     - "&7&m--------------------"
@@ -111,6 +113,7 @@ SCOREBOARD:
     - "&7Players Alive: &f{2}"
     - "&7Kills:&f {3}"
     - "&7Map:&6 {4}"
+    - "&7Gamemode:&f {5}"
     - "&r&r&r&r"
     - "&dwww.veltpvp.com&7 (Solo)"
     - "&7&m--------------------"
@@ -122,6 +125,7 @@ SCOREBOARD:
     - "&7Players Alive: &f{2}"
     - "&7Kills:&f {3}"
     - "&7Map:&e {4}"
+    - "&7Gamemode:&f {5}"
     - "&r&r&R&r&r"
     - "&dwww.veltpvp.com&7 (Solo)"
     - "&7&m--------------------"
@@ -133,6 +137,7 @@ SCOREBOARD:
     - "&7Players Alive: &f{2}"
     - "&7Kills:&f {3}"
     - "&7Map:&f {4}"
+    - "&7Gamemode:&f {5}"
     - "&r&r&r&r&r"
     - "&dwww.veltpvp.com&7 (Solo)"
     - "&7&m--------------------"
@@ -154,7 +159,7 @@ GAME:
   HIT: "{0}&e has &c{1} hearts&e."
   START:
     - "&7&m----------------------------------------------------"
-    - "&6&lSKYWARS"
+    - "&d&lSKYWARS"
     - " "
     - "&eGather resources from your island and attempt to eliminate"
     - "&eevery other player until you are the last one standing."
@@ -162,70 +167,70 @@ GAME:
     - "&e&oTip: Head to the center island for special chests!"
     - " "
     - "&7&m----------------------------------------------------"
-    - "&c&lTeaming is not allowed in this gam!"
+    - "&c&lTeaming is not allowed in this game!"
   GAME_OVER: "Game over. Winner: {0}"
   WON:
     - "&7&m----------------------------------------------------"
-    - "&6&lSKYWARS"
+    - "&d&lSKYWARS"
     - " "
     - "&eWinner &7- {0}"
     - " "
     - "&7&m----------------------------------------------------"
-  QUIT: "&a{0}&f has quit the gam!"
+  QUIT: "&a{0}&f has quit the game!"
   EVENT:
     REFILL_COUNTDOWN: "&6&lChests will be refilled in {0}!"
     REFILL: "&6&lChests have been refilled!"
     DEATHMATCH: "&c&lDeathmatch has begun! TNT will now rain from the sky!"
 KIT:
   DEFAULT:
-    NAME: "Broke Boy"
-    DESCRIPTION: "This is the broke boy kit. If you use it chances are you're broke as FUCK."
+    NAME: "Basic"
+    DESCRIPTION: "Get a head start with the golden armor you are supplied with!"
   BOMBER:
-    NAME: "Terrorist"
-    DESCRIPTION: "Blow shit the fuck up, and if you're MLG enough, blow yourself sky-high and land the bitch with your water bucket."
+    NAME: "Bomberman"
+    DESCRIPTION: "No buttons, levers, or pressure plates needed! Place a block of TNT and it will automatically ignite."
   TRAPPER:
     NAME: "Trapper"
-    DESCRIPTION: "Shit at PvP? Simply in the mood to make some queers rage quit? Well, fuck ups someone's day with some pistons, or build a saferoom and pray to Christ."
+    DESCRIPTION: "Create unique traps to take out your opponents with the items that you are supplied with!"
   MINER:
-    NAME: "School Shooter"
-    DESCRIPTION: "Only god knows why you'd use this shit kit, but hey, to each their own, right?"
+    NAME: "Miner"
+    DESCRIPTION: "Would you rather use a pickaxe than a sword? This is the perfect kit for you!"
   GHOST:
-    NAME: "MeeZoid"
-    DESCRIPTION: "Only click like 6 CPS? Simply too shit to PvP? Use an invisibility potion to camp out randoms!"
+    NAME: "Ghost"
+    DESCRIPTION: "Sneak up on your opponents from behind and take them out with this invisible potion!"
   MERCHANT:
     NAME: "Merchant"
-    DESCRIPTION: "Flex that bread, cuz that's all your making homie."
+    DESCRIPTION: "Someone towering over to your island? Use your eggs to knock them into the void!"
   RUSHER:
-    NAME: "Degenerate"
-    DESCRIPTION: "Instead of playing the gam, be that one bitch that builds over and K.O's the naked dude."
+    NAME: "Rusher"
+    DESCRIPTION: "Build over to the center of the map and quickly obtain loot. Take out any opponents nearby with your stone sword."
   GENERATOR:
-    NAME: "Skyblock Noob"
-    DESCRIPTION: "You're playing SkyWars, not SkyBlock you autistic fuck why would you use this kit?"
+    NAME: "Generator"
+    DESCRIPTION: "Defend your island and create more blocks by using the lava and water you have been equipped with!"
   ENDERMAN:
-    NAME: "Queer"
-    DESCRIPTION: "Receive an enderpearl every time you kill someone, have fun throwing those ball shaped pearls around faggot."
+    NAME: "Endermage"
+    DESCRIPTION: "You will receive one enderpearl everytime you get a kill!"
 
 LOBBY:
   JOIN: "&a{0}&f has joined the lobby! &a({1}/{2})"
   QUIT: "&a{0}&f has quit the lobby! &a({1}/{2})"
   KIT_SELECTION_ITEM:
-    NAME: "&aEULA Violating Kit Selector"
+    NAME: "&aKit Selector &7(Right Click)"
     LORE:
-      - "&fAre you really so fucking stupid that you don't know how to use this shit?"
+      - "&fRight click the compass to select your kit!"
 MENU:
   SPECTATOR:
-    TITLE: "Teleport to a fucking player"
+    TITLE: "Spectate a Player"
     LEAVE:
-      TITLE: "&cQuit the gam like a pussy"
+      TITLE: "&cLeave the Game"
       LORE:
-        - "&fFake news."
+        - "&f1 way ticket back to the SkyWars lobby!"
     COMPASS:
-      TITLE: "&aTeleport to a fucking player"
+      TITLE: "&aSpectate a Player"
       LORE:
-        - "&fCome on, really dumb fuck?"
+        - "&fChoose a player you would like to spectate."
   KIT_SELECTION:
-    SELECTED: "&fYou have selected the fucking &a{0}&f kit!"
-    TITLE: "Select a fucking kit"
+    SELECTED: "&fYou have selected the &a{0}&f kit!"
+    TITLE: "Select a Kit"
     UNLOCKED:
       TITLE: "&a{0}"
       LORE:
@@ -239,5 +244,5 @@ MENU:
         - "&f{0}" #description
         - " "
         - "&cYou do not own this kit."
-        - "&fBuy it on our fucking store broke ass."
+        - "&fBuy it on oure store: &dstore.veltpvp.com"
       MESSAGE: "&fYou do not own the &c{0}&f kit!"
