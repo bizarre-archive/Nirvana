@@ -1,18 +1,18 @@
 package com.veltpvp.nirvana.game.task;
 
 import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.GameEventStage;
 import com.veltpvp.nirvana.game.GameState;
+import com.veltpvp.nirvana.game.GameUtils;
 import com.veltpvp.nirvana.game.chest.GameChest;
 import com.veltpvp.nirvana.game.kit.GameKit;
 import com.veltpvp.nirvana.game.player.GamePlayer;
-import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
 import lombok.Getter;
 import net.minecraft.util.org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.HandlerList;
@@ -76,11 +76,7 @@ public class GameStartTask extends BukkitRunnable {
                 }
 
                 if (gamePlayer.getData().alive()) {
-                    Entity vehicle = player.getVehicle();
-                    if (vehicle != null) {
-                        player.leaveVehicle();
-                        vehicle.remove();
-                    }
+                    GameUtils.Freezing.unfreeze(player);
 
                     GameKit kit = gamePlayer.getData().kit();
                     if (kit != null) {

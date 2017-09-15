@@ -7,27 +7,25 @@ import com.veltpvp.nirvana.gamemode.Gamemode;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
 import com.veltpvp.nirvana.packet.NirvanaChannels;
 import com.veltpvp.nirvana.packet.ServerQueuePacket;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.npc.event.PlayerInteractNPCEvent;
 import us.ikari.phoenix.scoreboard.scoreboard.Board;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardCooldown;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardFormat;
-import us.ikari.phonix.util.time.Cooldown;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -198,6 +196,25 @@ public class LobbyListeners implements Listener {
     @EventHandler
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         event.setFoodLevel(20);
+    }
+
+    @EventHandler
+    public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.hasMetadata("HydrogenPrefix")) {
+            String prefix = player.getMetadata("HydrogenPrefix").get(0).asString();
+            event.setFormat(prefix + "%s: %s");
+        } else {
+            event.setFormat("%s: %s");
+        }
+    }
+
+    @EventHandler
+    public void onCreatureSpawnEvent(CreatureSpawnEvent event) {
+        if (event.getEntity() instanceof Animals) {
+            event.setCancelled(true);
+        }
     }
 
 }

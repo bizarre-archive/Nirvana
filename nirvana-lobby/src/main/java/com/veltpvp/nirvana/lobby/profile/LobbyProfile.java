@@ -4,8 +4,6 @@ import com.mongodb.client.MongoCollection;
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.lobby.LobbyProfileQueue;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
-import com.veltpvp.nitrogen.parties.party.Party;
-import com.veltpvp.nitrogen.parties.party.PartyMember;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
@@ -48,14 +46,13 @@ public class LobbyProfile {
     }
 
     public void load() {
-        Party party = Party.getByUuid(getUniqueId(), Nirvana.getInstance().getNetwork());
+        /*Party party = Party.getByUuid(getUniqueId(), Nirvana.getInstance().getNetwork());
 
         if (party != null) {
             for (PartyMember member : party.getMembers()) {
                 members.put(member.getUuid(), member.getName());
             }
-        }
-
+        }*/
     }
 
     public UUID getUniqueId() {

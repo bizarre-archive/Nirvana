@@ -1,7 +1,5 @@
 package com.veltpvp.nirvana.packet;
-
-import us.ikari.phoenix.network.redis.packet.Packet;
-
+import us.ikari.phoenix.network.packet.Packet;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

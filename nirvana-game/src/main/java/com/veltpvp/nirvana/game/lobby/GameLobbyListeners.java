@@ -1,17 +1,14 @@
 package com.veltpvp.nirvana.game.lobby;
 
 import com.veltpvp.nirvana.Nirvana;
-import com.veltpvp.nirvana.game.GameState;
+import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.GameUtils;
+import com.veltpvp.nirvana.game.kit.menu.GameKitSelectionMenu;
 import com.veltpvp.nirvana.game.player.GamePlayer;
-import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
+import com.veltpvp.nirvana.game.task.GameStartTask;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
-import net.minecraft.server.v1_7_R4.Entity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,9 +17,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import com.veltpvp.nirvana.game.Game;
-import com.veltpvp.nirvana.game.kit.menu.GameKitSelectionMenu;
-import com.veltpvp.nirvana.game.task.GameStartTask;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFileLocale;
 
 public class GameLobbyListeners implements Listener {
@@ -79,24 +73,7 @@ public class GameLobbyListeners implements Listener {
                     player.teleport(location);
                     gamePlayer.getData().spawnLocation(location);
 
-                    GameUtils.MutedHorse horse = new GameUtils.MutedHorse(player.getWorld());
-                    horse.setLocation(player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
-
-                    horse.getBukkitEntity().setPassenger(player);
-
-                    ((CraftWorld)player.getWorld()).getHandle().addEntity(horse);
-                    ((Horse)horse.getBukkitEntity()).setAdult();
-                    ((Horse)horse.getBukkitEntity()).setMaxHealth(2);
-
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            Entity entity = horse.getBukkitEntity().getHandle();
-                            entity.setInvisible(true);
-                            GameUtils.removeIntelligence((LivingEntity) horse.getBukkitEntity());
-                        }
-                    }.runTaskLater(main, 2L);
+                    GameUtils.Freezing.freeze(player);
 
                     break;
                 }

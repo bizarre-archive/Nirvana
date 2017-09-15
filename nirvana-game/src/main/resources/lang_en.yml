@@ -28,7 +28,7 @@ TAB:
       - "Starting soon..."
       - ""
       - "&e&lServer"
-      - "&7NA:&f SW-1"
+      - "&7NA:&f {9}"
   LOBBY:
     LEFT:
       - "&d&lVELT SKYWARS"
@@ -56,7 +56,7 @@ TAB:
       - "Starting in {10}s"
       - ""
       - "&e&lServer"
-      - "&7NA:&f SW-1"
+      - "&7NA:&f {9}"
   GAME:
     LEFT:
       - "&d&lVELT SKYWARS"
@@ -83,7 +83,7 @@ TAB:
       - ""
       - ""
       - "&e&lServer"
-      - "&7NA:&f SW-1"
+      - "&7NA:&f {9}"
 SCOREBOARD:
   TITLE: "&d&lSkyWars"
   LOBBY_WAITING:
@@ -151,7 +151,7 @@ DEATH_MESSAGE:
   LAVA: "{0}&e tried to swim in lava."
   DROWNING: "{0}&e drowned."
   BLOCK_EXPLOSION: "{0}&e blew up."
-  ENTITY_EXPLOSION: "{9}&e blew up."
+  ENTITY_EXPLOSION: "{0}&e blew up."
   VOID: "{0}&e fell into the void."
   STARVATION: "{0}&e starved to death."
 GAME:

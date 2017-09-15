@@ -1,9 +1,7 @@
 package com.veltpvp.nirvana.packet.lobby;
 
-import com.veltpvp.nirvana.packet.server.NirvanaServer;
-import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
 import lombok.Getter;
-import us.ikari.phoenix.network.redis.packet.Packet;
+import us.ikari.phoenix.network.packet.Packet;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

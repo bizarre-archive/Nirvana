@@ -4,13 +4,17 @@ import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.gamemode.Gamemode;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
+import net.frozenorb.hydrogen.Hydrogen;
+import net.frozenorb.hydrogen.profile.Profile;
+import net.frozenorb.hydrogen.profile.ProfileHandler;
+import net.frozenorb.hydrogen.rank.Rank;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import us.ikari.azazel.tab.TabAdapter;
 import us.ikari.azazel.tab.TabTemplate;
 
-import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.UUID;
 
 public class NirvanaTabAdapter implements TabAdapter {
@@ -38,7 +42,17 @@ public class NirvanaTabAdapter implements TabAdapter {
 
             template.left("");
             template.left(ChatColor.YELLOW + "" + ChatColor.BOLD + "You");
-            template.left(ChatColor.GRAY + "Rank: " + ChatColor.WHITE + "Member");
+
+            ProfileHandler handler = Hydrogen.getInstance().getProfileHandler();
+            Optional<Profile> optional = handler.getProfile(player.getUniqueId());
+
+            if (optional.isPresent()) {
+                Rank rank = optional.get().getBestDisplayRank();
+                template.left(ChatColor.GRAY + "Rank: " + rank.getGameColor() + rank.getDisplayName());
+            } else {
+                template.left(ChatColor.GRAY + "Rank: " + ChatColor.WHITE + "API Error");
+            }
+
             template.left(ChatColor.GRAY + "Total Kills: " + ChatColor.WHITE + fragment.getTotalKills());
             template.left(ChatColor.GRAY + "Total Deaths: " + ChatColor.WHITE + fragment.getTotalDeaths());
             template.left("");

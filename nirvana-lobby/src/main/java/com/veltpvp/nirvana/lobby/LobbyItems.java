@@ -35,7 +35,8 @@ public class LobbyItems {
 
         BookMeta meta = (BookMeta) toReturn.getItemMeta();
 
-        meta.setAuthor("VeltPvP Administration Team");
+        meta.setAuthor("VeltPvP");
+        meta.setTitle("Welcome to SkyWars");
         meta.addPage(ChatColor.GOLD + "" + ChatColor.BOLD + "Welcome to " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD  +"VeltPvP") + ChatColor.GOLD + "" + ChatColor.BOLD + " SkyWars!");
 
         toReturn.setItemMeta(meta);

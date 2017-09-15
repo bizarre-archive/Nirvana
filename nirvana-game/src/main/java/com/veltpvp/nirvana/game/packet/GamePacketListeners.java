@@ -7,11 +7,10 @@ import com.veltpvp.nirvana.packet.NirvanaChannels;
 import com.veltpvp.nirvana.packet.ServerInfoPacket;
 import com.veltpvp.nirvana.packet.ServerSetTypePacket;
 import org.bukkit.Bukkit;
-import org.bukkit.block.Chest;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
+import us.ikari.phoenix.network.packet.event.PacketListener;
+import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.RedisNetwork;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
-import us.ikari.phoenix.network.redis.packet.event.PacketListener;
-import us.ikari.phoenix.network.redis.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkListThread;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
 
@@ -22,17 +21,8 @@ public class GamePacketListeners {
     public GamePacketListeners() {
         RedisNetwork network = main.getNetwork();
 
-        network.registerThread(new RedisNetworkSubscribeThread(main.getNetwork(), NirvanaChannels.SLAVE_CHANNEL, ServerInfoPacket.class.getClassLoader()));
-        network.registerThread(new RedisNetworkListThread(main.getNetwork(), Bukkit.getServerName(), ServerInfoPacket.class.getClassLoader()));
-        RedisNetworkSubscribeThread thread = (RedisNetworkSubscribeThread) network.getThreadByChannel(NirvanaChannels.SLAVE_CHANNEL);
-        while (thread == null || !thread.getPubSub().isSubscribed()) {
-            thread = (RedisNetworkSubscribeThread) network.getThreadByChannel(NirvanaChannels.SLAVE_CHANNEL);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        network.registerThread(new RedisNetworkSubscribeThread(main.getNetwork(), NirvanaChannels.SLAVE_CHANNEL));
+        network.registerThread(new RedisNetworkListThread(main.getNetwork(), Bukkit.getServerName()));
 
         network.registerPacketListener(this);
     }
@@ -70,7 +60,7 @@ public class GamePacketListeners {
             System.out.println("GAMEMODE SET TO " + ((ServerSetTypePacket) event.getPacket()).getType().name());
             System.out.println("GAMEMODE CHESTS SET TO " + chest.name());
 
-            if (GameChest.POTPVP.getInstances().size() != chest.getInstances().size()) {
+            if (GameChest.POTPVP.getInstances().size() > 0 && GameChest.POTPVP.getInstances().size() != chest.getInstances().size()) {
                 chest.setInstances(GameChest.POTPVP.getInstances());
                 System.out.println("SET THE INSTANCES");
             } else {

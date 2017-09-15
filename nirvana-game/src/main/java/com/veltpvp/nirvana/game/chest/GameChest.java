@@ -7,7 +7,6 @@ import com.veltpvp.nirvana.game.chest.content.PotPvPGameChestContent;
 import com.veltpvp.nirvana.game.chest.content.UHCGameChestContent;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -28,7 +27,7 @@ public enum GameChest {
     GameChest(GameChestContent content, String name) {
         this.content = content;
         this.name = name;
-        this.instances = new ArrayList<>();
+        this.instances = Collections.synchronizedList(new ArrayList<>());
     }
 
     public static GameChest getCurrent() {
@@ -61,6 +60,10 @@ public enum GameChest {
     }
 
     private static Map.Entry<GameChest, GameChestTier> getPairByLocation(GameChest chest, Location location) {
+        if (chest.getInstances().isEmpty()) {
+            return new AbstractMap.SimpleEntry<>(GameChest.POTPVP, GameChestTier.BASIC);
+        }
+        
         for (Map.Entry<Location, GameChestTier> pair : chest.getInstances()) {
             if (pair.getKey().distance(location) <= 1) {
                 return new AbstractMap.SimpleEntry<>(chest, pair.getValue());

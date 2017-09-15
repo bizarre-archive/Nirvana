@@ -1,21 +1,20 @@
 package com.veltpvp.nirvana.game.player;
 
+import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.GameState;
+import com.veltpvp.nirvana.game.spectator.GameSpectator;
+import com.veltpvp.nirvana.game.task.GameStartTask;
 import com.veltpvp.nirvana.packet.NirvanaChannels;
 import com.veltpvp.nirvana.packet.ServerInfoPacket;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_7_R4.TileEntity;
 import net.minecraft.server.v1_7_R4.TileEntityChest;
-import net.minecraft.server.v1_7_R4.World;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R4.block.CraftChest;
-import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -34,13 +33,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
-import com.veltpvp.nirvana.Nirvana;
-import com.veltpvp.nirvana.game.Game;
-import com.veltpvp.nirvana.game.spectator.GameSpectator;
-import com.veltpvp.nirvana.game.task.GameStartTask;
 import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFileLocale;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.scoreboard.scoreboard.Board;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardCooldown;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardFormat;
@@ -118,7 +113,7 @@ public class GamePlayerListeners implements Listener {
             }
 
             if (game.getState() == GameState.PLAY) {
-                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TimeBmomb" + ChatColor.RESET) + ChatColor.GRAY + "] " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.GRAY)
+                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TimeBomb" + ChatColor.RESET) + ChatColor.GRAY + "] " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.GRAY)
                         + (player.getName().endsWith("s") || player.getName().endsWith("z") ? "'" : "'s") + " corpse will explode in " + ChatColor.LIGHT_PURPLE + "10 seconds" + ChatColor.GRAY + "!");
 
             }
@@ -205,7 +200,12 @@ public class GamePlayerListeners implements Listener {
             }
 
         } else {
-            EntityDamageEvent.DamageCause cause = player.getLastDamageCause().getCause();
+            EntityDamageEvent.DamageCause cause;
+            if (player.getLastDamageCause() == null) {
+                cause = EntityDamageEvent.DamageCause.CUSTOM;
+            } else {
+                cause = player.getLastDamageCause().getCause();
+            }
 
             for (Player online : Bukkit.getOnlinePlayers()) {
                 String message;
@@ -347,26 +347,23 @@ public class GamePlayerListeners implements Listener {
         if (gamePlayer != null) {
             gamePlayer.getData().alive(false);
 
-            Location location = player.getLocation();
-            if (location.getBlockY() <= 0) {
-                location = player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation();
-            }
-
-            Location finalLocation = location;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.spigot().respawn();
+                    player.setHealth(player.getMaxHealth());
+                    player.setFoodLevel(20);
                     gamePlayer.getData().spectator(new GameSpectator(player));
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            player.teleport(finalLocation);
+
+                    if (player.getLocation().getBlockY() <= 0) {
+                        if (player.getKiller() != null) {
+                            player.teleport(player.getKiller().getLocation());
+                        } else {
+                            player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
                         }
-                    }.runTaskLater(main, 4L);
+                    }
 
                 }
-            }.runTaskLater(main, 1L);
+            }.runTaskLater(main, 2L);
 
             game.update();
         }
@@ -377,7 +374,7 @@ public class GamePlayerListeners implements Listener {
         Player player = event.getPlayer();
         GamePlayer gamePlayer = game.getByPlayer(player);
 
-        if (gamePlayer != null && gamePlayer.getData().spectator() == null) {
+        if (gamePlayer != null) {
             gamePlayer.getData().spectator(new GameSpectator(player));
         }
     }

@@ -1,10 +1,13 @@
 package com.veltpvp.nirvana.game;
 
 import net.minecraft.server.v1_7_R4.*;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftCreature;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R4.util.UnsafeList;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -94,6 +97,61 @@ public class GameUtils {
         protected String cv() {
             return null;
         }
+    }
+
+    public static class Freezing {
+
+        private static final int FREEZE_ENTITY_ID = -1;
+
+        public static void freeze(Player player) {
+            Location location = player.getLocation();
+
+            while (!location.getBlock().getType().isSolid()) {
+                location.subtract(0, 1, 0);
+            }
+            location.add(0, 1, 0);
+
+            player.teleport(location);
+
+            try {
+                PacketPlayOutSpawnEntityLiving spawnPacket = new PacketPlayOutSpawnEntityLiving();
+                setField(spawnPacket, int.class, 0, FREEZE_ENTITY_ID);
+                setField(spawnPacket, int.class, 1, (byte) 65);
+                setField(spawnPacket, int.class, 2, (int) Math.floor(location.getX() * 32.0D));
+                setField(spawnPacket, int.class, 3, (int) Math.floor(location.getY() * 32.0D));
+                setField(spawnPacket, int.class, 4, (int) Math.floor(location.getZ() * 32.0D));
+                DataWatcher watcher = new DataWatcher(null);
+                watcher.a(0, (byte) 0x20);
+                setField(spawnPacket, DataWatcher.class, 0, watcher);
+
+                PacketPlayOutAttachEntity attachPacket = new PacketPlayOutAttachEntity();
+                setField(attachPacket, int.class, 0, 0);
+                setField(attachPacket, int.class, 1, player.getEntityId());
+                setField(attachPacket, int.class, 2, FREEZE_ENTITY_ID);
+
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(spawnPacket);
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(attachPacket);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static void unfreeze(Player player) {
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(FREEZE_ENTITY_ID));
+        }
+
+        private static void setField(Object object, Class<?> type, int index, Object value) throws NoSuchFieldException, IllegalAccessException {
+            int i = 0;
+
+            for (Field field : object.getClass().getDeclaredFields()) {
+                if (field.getType().equals(type) && i++ == index) {
+                    field.setAccessible(true);
+                    field.set(object, value);
+                    break;
+                }
+            }
+        }
+
     }
 
 }

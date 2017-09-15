@@ -1,7 +1,5 @@
 package com.veltpvp.nirvana;
 
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
 import com.veltpvp.nirvana.board.NirvanaBoardAdapter;
 import com.veltpvp.nirvana.gamemode.Gamemode;
 import com.veltpvp.nirvana.lobby.Lobby;
@@ -10,9 +8,7 @@ import com.veltpvp.nirvana.lobby.LobbyMenu;
 import com.veltpvp.nirvana.lobby.LobbyProfileQueue;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfileListeners;
-import com.veltpvp.nirvana.packet.BootyCallPacket;
-import com.veltpvp.nirvana.packet.NirvanaChannels;
-import com.veltpvp.nirvana.packet.ServerQueuePacket;
+import com.veltpvp.nirvana.packet.*;
 import com.veltpvp.nirvana.packet.lobby.LobbyServer;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerListPacket;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerRemovePacket;
@@ -20,13 +16,12 @@ import com.veltpvp.nirvana.packet.lobby.LobbyServerStatusPacket;
 import com.veltpvp.nirvana.tab.NirvanaTabAdapter;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import com.veltpvp.nirvana.util.NirvanaUtils;
-import com.veltpvp.nitrogen.parties.Nitrogen;
-import com.veltpvp.nitrogen.parties.packet.PartyUpdatePacket;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,18 +33,17 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.bukkit.scheduler.BukkitRunnable;
 import us.ikari.azazel.Azazel;
-import us.ikari.azazel.tab.example.ExampleTabAdapter;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.gui.menu.PlayerMenu;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
+import us.ikari.phoenix.network.packet.event.PacketListener;
+import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
-import us.ikari.phoenix.network.redis.packet.event.PacketListener;
-import us.ikari.phoenix.network.redis.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.scoreboard.Aether;
@@ -57,7 +51,6 @@ import us.ikari.phoenix.scoreboard.AetherOptions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 public class Nirvana extends JavaPlugin implements Listener {
 
@@ -85,9 +78,9 @@ public class Nirvana extends JavaPlugin implements Listener {
 
         Gamemode.load();
 
-        network = new RedisNetwork(new RedisNetworkConfiguration("localhost"));
+        network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"));
         network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
-        network.registerThread(new RedisNetworkSubscribeThread(network, Nitrogen.REDIS_CHANNEL));
+        //network.registerThread(new RedisNetworkSubscribeThread(network, Nitrogen.REDIS_CHANNEL));
         network.registerPacketListener(this);
 
         mongo = new NirvanaDatabase(this);
@@ -102,6 +95,14 @@ public class Nirvana extends JavaPlugin implements Listener {
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 
         NPC.prepare(this);
+
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity instanceof Animals) {
+                    entity.remove();
+                }
+            }
+        }
 
         registerListeners();
     }
@@ -124,7 +125,6 @@ public class Nirvana extends JavaPlugin implements Listener {
 
         network.shutdown();
     }
-
 
     @EventHandler
     public void onChunkLoadEvent(ChunkLoadEvent event) {
@@ -155,6 +155,16 @@ public class Nirvana extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         network.sendPacket(new LobbyServerStatusPacket(new LobbyServer(id, Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers(), System.currentTimeMillis())), NirvanaChannels.APPLICATION_CHANNEL, PacketDeliveryMethod.DIRECT);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Player player = event.getPlayer();
+                player.sendMessage("");
+                player.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + " * " + ChatColor.RESET + ChatColor.YELLOW + "We are currently in " + ChatColor.LIGHT_PURPLE + "beta" + ChatColor.YELLOW + ". If you find a bug please " + ChatColor.RED + "report" + ChatColor.YELLOW + " it.");
+                player.sendMessage("");
+            }
+        }.runTaskLaterAsynchronously(this, 20L);
     }
 
     @EventHandler
@@ -172,6 +182,23 @@ public class Nirvana extends JavaPlugin implements Listener {
         if (lobby == null) {
             Gamemode.loadLocations();
             lobby = new Lobby(event.getWorld().getSpawnLocation());
+        }
+    }
+
+    @PacketListener({ServerSendPlayerPacket.class})
+    public void onServerSendPlayerPacket(PacketReceiveEvent event) {
+        ServerSendPlayerPacket packet = (ServerSendPlayerPacket) event.getPacket();
+
+        for (String playerName : packet.getPlayers()) {
+            Player player = Bukkit.getPlayer(playerName);
+            if (player != null) {
+                LobbyProfile profile = LobbyProfile.getByPlayer(player);
+                if (profile != null) {
+                    if (profile.getQueue() != null) {
+                        profile.setQueue(null);
+                    }
+                }
+            }
         }
     }
 
@@ -197,7 +224,7 @@ public class Nirvana extends JavaPlugin implements Listener {
 
     }
 
-    @PacketListener({PartyUpdatePacket.class})
+    /*@PacketListener({PartyUpdatePacket.class}) TODO: reenable l8r
     public void onPartyUpdatePacketReceiveEvent(PacketReceiveEvent event) {
         PartyUpdatePacket packet = (PartyUpdatePacket) event.getPacket();
 
@@ -228,7 +255,7 @@ public class Nirvana extends JavaPlugin implements Listener {
             }
 
         }
-    }
+    }*/
 
     @PacketListener({BootyCallPacket.class})
     public void onBootyCallPacketReceiveEvent(PacketReceiveEvent event) {

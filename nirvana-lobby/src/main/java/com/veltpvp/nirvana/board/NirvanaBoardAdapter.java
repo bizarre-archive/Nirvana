@@ -2,7 +2,6 @@ package com.veltpvp.nirvana.board;
 
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
-import com.veltpvp.nirvana.packet.lobby.LobbyServer;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,7 +38,7 @@ public class NirvanaBoardAdapter implements BoardAdapter {
                 toReturn.add(ChatColor.LIGHT_PURPLE + "Server: " + ChatColor.WHITE + Nirvana.getInstance().getId().toUpperCase());
             } else {
                 toReturn.add(ChatColor.LIGHT_PURPLE + "Queue Information");
-                toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Game Type &7-&f " + profile.getQueue().getName());
+                toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Game Type " + ChatColor.GRAY + "- " + ChatColor.WHITE + profile.getQueue().getName());
 
                 long time = System.currentTimeMillis() - profile.getQueue().getInit();
                 String duration;
@@ -51,7 +50,7 @@ public class NirvanaBoardAdapter implements BoardAdapter {
                 }
 
 
-                toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Time Taken &7-&f " + duration);
+                toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Time Taken " + ChatColor.GRAY + "- " + ChatColor.WHITE + duration);
             }
 
             toReturn.add(" ");

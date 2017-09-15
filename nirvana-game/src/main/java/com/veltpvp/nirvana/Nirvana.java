@@ -5,11 +5,12 @@ import com.veltpvp.nirvana.game.GameChunkGenerator;
 import com.veltpvp.nirvana.game.GameListeners;
 import com.veltpvp.nirvana.game.GameLoader;
 import com.veltpvp.nirvana.game.board.GameBoardAdapter;
+import com.veltpvp.nirvana.game.chest.GameChestListeners;
+import com.veltpvp.nirvana.game.kit.ability.GameKitAbilityListeners;
 import com.veltpvp.nirvana.game.packet.GamePacketListeners;
-import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.game.player.GamePlayerListeners;
 import com.veltpvp.nirvana.game.spectator.GameSpectatorListeners;
-import com.veltpvp.nirvana.game.kit.ability.GameKitAbilityListeners;
+import com.veltpvp.nirvana.game.tab.GameTabAdapter;
 import com.veltpvp.nirvana.packet.NirvanaChannels;
 import com.veltpvp.nirvana.packet.ServerInfoPacket;
 import com.veltpvp.nirvana.packet.server.NirvanaServer;
@@ -27,14 +28,12 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.ikari.azazel.Azazel;
-import com.veltpvp.nirvana.game.chest.GameChestListeners;
-import com.veltpvp.nirvana.game.tab.GameTabAdapter;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFile;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.scoreboard.Aether;
 import us.ikari.phoenix.scoreboard.AetherOptions;
 
@@ -59,9 +58,9 @@ public class Nirvana extends JavaPlugin implements Listener {
     public void onEnable() {
         instance = this;
 
-        configFile = new BasicConfigurationFile(this, "config", true);
+        configFile = new BasicConfigurationFile(this, "config", false);
         langFile = new LanguageConfigurationFile(this, "lang", true);
-        network = new RedisNetwork(new RedisNetworkConfiguration(configFile.getStringOrDefault("REDIS.HOST", "localhost")), ServerInfoPacket.class.getClassLoader());
+        network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"), ServerInfoPacket.class.getClassLoader());
         phoenixGui = new PhoenixGui(this);
         mongo = new NirvanaDatabase(this);
 

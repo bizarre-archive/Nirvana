@@ -168,7 +168,7 @@ public class Game {
     }
 
     public boolean hasEnoughPlayers() {
-        return state == GameState.LOBBY && players.size() >= 2;
+        return state == GameState.LOBBY && players.size() >= 6;
     }
 
 }

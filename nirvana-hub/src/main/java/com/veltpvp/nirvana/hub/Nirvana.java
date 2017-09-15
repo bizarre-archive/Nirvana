@@ -9,14 +9,14 @@ import com.veltpvp.nirvana.packet.server.NirvanaServer;
 import com.veltpvp.nirvana.packet.server.NirvanaServerStatus;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import lombok.Getter;
+import us.ikari.phoenix.network.packet.Packet;
+import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
+import us.ikari.phoenix.network.packet.event.PacketListener;
+import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
+import us.ikari.phoenix.network.packet.handler.PacketExceptionHandler;
+import us.ikari.phoenix.network.packet.handler.PacketResponseHandler;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
-import us.ikari.phoenix.network.redis.packet.Packet;
-import us.ikari.phoenix.network.redis.packet.PacketDeliveryMethod;
-import us.ikari.phoenix.network.redis.packet.event.PacketListener;
-import us.ikari.phoenix.network.redis.packet.event.PacketReceiveEvent;
-import us.ikari.phoenix.network.redis.packet.handler.PacketExceptionHandler;
-import us.ikari.phoenix.network.redis.packet.handler.PacketResponseHandler;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkListThread;
 
 import java.util.*;
@@ -83,7 +83,7 @@ public class Nirvana {
                                 if (server.getType() == NirvanaServerType.PENDING) {
                                     System.out.println(type + " SENDING PACKETS");
                                     server.setType(type);
-                                    network.sendSyncPacket(new ServerSetTypePacket(server.getId(), type), server.getId(), PacketDeliveryMethod.DIRECT, Integer.MAX_VALUE, new PacketResponseHandler() {
+                                    network.sendSyncPacket(new ServerSetTypePacket(server.getId(), type), server.getId(), PacketDeliveryMethod.DIRECT, 5000, new PacketResponseHandler() {
                                         @Override
                                         public void onResponse(Packet packet) {
 
@@ -106,7 +106,7 @@ public class Nirvana {
                     }
 
                     try {
-                        Thread.sleep(1500);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -114,6 +114,26 @@ public class Nirvana {
             }
         }.start();
 
+    }
+
+
+    @PacketListener({RequestPlayerCountPacket.class})
+    public void onRequestPlayerCountPacketReceiveEvent(PacketReceiveEvent event) {
+        int count = 0;
+
+        for (NirvanaServer server : servers) {
+            count+=server.getPlayers();
+        }
+
+        for (LobbyServer server : lobbies) {
+            count+=server.getPlayers();
+        }
+
+        NirvanaServer server = new NirvanaServer("TOTAL");
+        server.setType(NirvanaServerType.PENDING);
+        server.setPlayers(count);
+
+        event.setResponse(new ServerInfoPacket(server));
     }
 
     @PacketListener({ServerInfoPacket.class})
@@ -130,6 +150,8 @@ public class Nirvana {
             } else {
                 local.setStatus(server.getStatus());
                 local.setType(server.getType());
+                local.setPlayers(server.getPlayers());
+                local.setMaxPlayers(server.getMaxPlayers());
                 System.out.println("Server updated. (ID: " + server.getId() + ", TYPE: " + server.getType() + ", STATUS: " + server.getStatus().name() + ", PLAYERS: " + packet.getServer().getPlayers() + ", MAX: " + packet.getServer().getMaxPlayers() + ")");
             }
         }
@@ -201,9 +223,14 @@ public class Nirvana {
         }
 
         if (type == NirvanaServerType.LOBBY) {
+            System.out.println("The type is of lobby..");
+            System.out.println("Iterating over lobby types.");
             for (LobbyServer server : lobbies) {
+                System.out.println("Found lobby");
                 if (server.getPlayers() + count <= server.getMaxPlayers()) {
+                    System.out.println("Lobby has enough player room left");
                     event.setResponse(new LobbyServerStatusPacket(server));
+                    System.out.println("Sent lobby response");
                     return;
                 }
             }
@@ -358,7 +385,7 @@ public class Nirvana {
     }
 
     public static void main(String[] args) {
-        new Nirvana(new RedisNetwork(new RedisNetworkConfiguration("localhost")));
+        new Nirvana(new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2")));
     }
 
 }

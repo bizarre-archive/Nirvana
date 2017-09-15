@@ -127,12 +127,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.veltpvp.nitrogen</groupId>
-            <artifactId>nitrogen-parties</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>us.ikari.phoenix</groupId>
             <artifactId>phoenix-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
@@ -142,6 +136,12 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.frozenorb</groupId>
+            <artifactId>Hydrogen</artifactId>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

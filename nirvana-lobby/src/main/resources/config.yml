@@ -7,6 +7,6 @@ GAMEMODES:
   CLASSIC:
     NAME: "Classic"
 MONGO:
-  HOST: localhost
+  HOST: 10.0.9.2
   PORT: 27017
   DATABASE: "skywars"

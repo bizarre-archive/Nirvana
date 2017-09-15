@@ -2,8 +2,8 @@ package com.veltpvp.nirvana.packet;
 
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import lombok.Getter;
-import us.ikari.phoenix.network.redis.packet.Packet;
 
+import us.ikari.phoenix.network.packet.Packet;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
