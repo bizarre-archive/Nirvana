@@ -354,16 +354,22 @@ public class GamePlayerListeners implements Listener {
                     player.setFoodLevel(20);
                     gamePlayer.getData().spectator(new GameSpectator(player));
 
-                    if (player.getLocation().getBlockY() <= 0) {
-                        if (player.getKiller() != null) {
-                            player.teleport(player.getKiller().getLocation());
-                        } else {
-                            player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (player.getLocation().getBlockY() <= 0) {
+                                if (player.getKiller() != null) {
+                                    player.teleport(player.getKiller().getLocation());
+                                } else {
+                                    player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
+                                }
+                            }
                         }
-                    }
+                    }.runTaskLater(main, 8L);
 
                 }
-            }.runTaskLater(main, 2L);
+            }.runTaskLater(main, 4L);
 
             game.update();
         }

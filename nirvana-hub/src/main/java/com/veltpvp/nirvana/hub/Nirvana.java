@@ -122,7 +122,9 @@ public class Nirvana {
         int count = 0;
 
         for (NirvanaServer server : servers) {
-            count+=server.getPlayers();
+            if (server.getStatus() != NirvanaServerStatus.OFFLINE) {
+                count += server.getPlayers();
+            }
         }
 
         for (LobbyServer server : lobbies) {
@@ -152,6 +154,11 @@ public class Nirvana {
                 local.setType(server.getType());
                 local.setPlayers(server.getPlayers());
                 local.setMaxPlayers(server.getMaxPlayers());
+
+                if (server.getStatus() == NirvanaServerStatus.OFFLINE) {
+                    local.setPlayers(0);
+                }
+
                 System.out.println("Server updated. (ID: " + server.getId() + ", TYPE: " + server.getType() + ", STATUS: " + server.getStatus().name() + ", PLAYERS: " + packet.getServer().getPlayers() + ", MAX: " + packet.getServer().getMaxPlayers() + ")");
             }
         }
