@@ -267,7 +267,7 @@ public class Nirvana extends JavaPlugin implements Listener {
 
     @PacketListener({LobbyServerListPacket.class})
     public void onLobbyServerListPacketReceiveEvent(PacketReceiveEvent event) {
-        lobbies = ((LobbyServerListPacket)event.getPacket()).getServers();
+        lobbies = ((LobbyServerListPacket) event.getPacket()).getServers();
 
         for (PlayerMenu menu : PlayerMenu.getMenus()) {
             if (menu instanceof LobbyMenu) {

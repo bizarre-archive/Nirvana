@@ -22,8 +22,8 @@ public class Lobby {
 
         player.getInventory().clear();
 
-        player.getInventory().setItem(0, LobbyItems.INFORMATION_BOOK);
-        player.getInventory().setItem(1, profile.isHidePlayers() ? LobbyItems.TOGGLE_VISIBILITY_ON_ITEM : LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM);
+        player.getInventory().setItem(0, LobbyItems.GAME_SELECTOR);
+        player.getInventory().setItem(7, profile.isHidePlayers() ? LobbyItems.TOGGLE_VISIBILITY_ON_ITEM : LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM);
         player.getInventory().setItem(8, LobbyItems.LOBBY_SELECTOR);
     }
 

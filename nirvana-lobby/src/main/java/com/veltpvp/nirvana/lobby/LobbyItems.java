@@ -16,6 +16,7 @@ public class LobbyItems {
     public static final ItemStack TOGGLE_VISIBILITY_ON_ITEM = getTogglePlayersOnItem();
     public static final ItemStack INFORMATION_BOOK = getInformationBook();
     public static final ItemStack LOBBY_SELECTOR = getLobbySelector();
+    public static final ItemStack GAME_SELECTOR = getGameSelector();
 
     private static ItemStack getTogglePlayersOffItem() {
         ItemStack toReturn = new MenuItemBuilder(Material.INK_SACK).durability(8).name(ChatColor.GREEN + "Toggle Visibility").build().getItemStack();
@@ -37,7 +38,7 @@ public class LobbyItems {
 
         meta.setAuthor("VeltPvP");
         meta.setTitle("Welcome to SkyWars");
-        meta.addPage(ChatColor.GOLD + "" + ChatColor.BOLD + "Welcome to " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD  +"VeltPvP") + ChatColor.GOLD + "" + ChatColor.BOLD + " SkyWars!");
+        meta.addPage(ChatColor.GOLD + "" + ChatColor.BOLD + "Welcome to " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "VeltPvP") + ChatColor.GOLD + "" + ChatColor.BOLD + " SkyWars!");
 
         toReturn.setItemMeta(meta);
 
@@ -46,6 +47,12 @@ public class LobbyItems {
 
     private static ItemStack getLobbySelector() {
         ItemStack toReturn = new MenuItemBuilder(Material.NETHER_STAR).name(ChatColor.YELLOW + "Lobby Selector").build().getItemStack();
+
+        return toReturn;
+    }
+
+    private static ItemStack getGameSelector() {
+        ItemStack toReturn = new MenuItemBuilder(Material.COMPASS).name(ChatColor.GOLD + "Game Selector").build().getItemStack();
 
         return toReturn;
     }

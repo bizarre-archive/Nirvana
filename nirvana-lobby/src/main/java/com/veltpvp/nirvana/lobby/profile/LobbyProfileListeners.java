@@ -36,7 +36,7 @@ public class LobbyProfileListeners implements Listener {
                         public void run() {
 
                             NPC nigga;
-                            if (((CraftPlayer)player).getHandle().playerConnection.networkManager.getVersion() >= 47) {
+                            if (((CraftPlayer) player).getHandle().playerConnection.networkManager.getVersion() >= 47) {
                                 nigga = new NPC(player.getUniqueId(), " ").spawn(new Location(npc.getWorld(), npc.getBlockX() + 0.5, npc.getBlockY() - 0.5, npc.getBlockZ() + 0.5, npc.getYaw(), npc.getPitch()), player).hideName();
                             } else {
                                 nigga = new NPC(player.getUniqueId(), player.getName()).spawn(new Location(npc.getWorld(), npc.getBlockX() + 0.5, npc.getBlockY() - 0.5, npc.getBlockZ() + 0.5, npc.getYaw(), npc.getPitch()), player).hideName();
