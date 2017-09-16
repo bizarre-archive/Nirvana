@@ -121,7 +121,7 @@ public class LobbyListeners implements Listener {
                 }
 
                 if (itemStack.equals(LobbyItems.GAME_SELECTOR)) {
-                    player.openInventory(new GameMenu(player).getInventory());
+                    new GameMenu().openMenu(player);
                 }
             }
         }

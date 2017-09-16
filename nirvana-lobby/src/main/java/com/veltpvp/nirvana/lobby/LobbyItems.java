@@ -52,7 +52,7 @@ public class LobbyItems {
     }
 
     private static ItemStack getGameSelector() {
-        ItemStack toReturn = new MenuItemBuilder(Material.COMPASS).name(ChatColor.GOLD + "Game Selector").build().getItemStack();
+        ItemStack toReturn = new MenuItemBuilder(Material.BOOK).name(ChatColor.GOLD + "Game Selector").build().getItemStack();
 
         return toReturn;
     }

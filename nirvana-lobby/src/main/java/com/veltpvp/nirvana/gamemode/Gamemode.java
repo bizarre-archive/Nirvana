@@ -12,8 +12,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
 import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.npc.NPC;
@@ -25,6 +29,18 @@ public class Gamemode {
 
     private static Nirvana main = Nirvana.getInstance();
     private static List<Gamemode> gamemodes = new ArrayList<>();
+
+    /*
+    \u00BB
+    \u00AB
+     */
+
+    private static final String ARROW_RIGHT = ChatColor.GRAY + "»";
+    private static final String ARROW_LEFT = ChatColor.GRAY + "«";
+
+    private static final ItemStack UHC_ITEM = new MenuItemBuilder(Material.GOLDEN_APPLE).durability(1).name(ARROW_RIGHT + " &6&lUHC &d&lSkyWars " + ARROW_LEFT).build().getItemStack();
+    private static final ItemStack CLASSIC_ITEM = new MenuItemBuilder(Material.DIAMOND_SWORD).enchantment(Enchantment.DAMAGE_ALL, 1).name(ARROW_RIGHT + " &c&lClassic &d&lSkyWars " + ARROW_LEFT).build().getItemStack();
+    private static final ItemStack POTPVP_ITEM = new MenuItemBuilder(Material.POTION).durability(16421).name(ARROW_RIGHT + " &e&lPotPvP &d&lSkyWars" + ARROW_LEFT).build().getItemStack();
 
     @Getter private final String id;
     @Getter private final String name;
@@ -85,6 +101,12 @@ public class Gamemode {
         }
 
         return null;
+    }
+
+    public ItemStack getItem() {
+        return name.equalsIgnoreCase("uhc") ? UHC_ITEM :
+                name.equalsIgnoreCase("classic") ? CLASSIC_ITEM :
+                        POTPVP_ITEM;
     }
 
     public static Gamemode getById(String id) {

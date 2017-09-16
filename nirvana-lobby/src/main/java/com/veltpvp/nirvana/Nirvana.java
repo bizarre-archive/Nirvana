@@ -8,7 +8,10 @@ import com.veltpvp.nirvana.lobby.LobbyMenu;
 import com.veltpvp.nirvana.lobby.LobbyProfileQueue;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfileListeners;
-import com.veltpvp.nirvana.packet.*;
+import com.veltpvp.nirvana.packet.BootyCallPacket;
+import com.veltpvp.nirvana.packet.NirvanaChannels;
+import com.veltpvp.nirvana.packet.ServerQueuePacket;
+import com.veltpvp.nirvana.packet.ServerSendPlayerPacket;
 import com.veltpvp.nirvana.packet.lobby.LobbyServer;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerListPacket;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerRemovePacket;
@@ -17,7 +20,11 @@ import com.veltpvp.nirvana.tab.NirvanaTabAdapter;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import com.veltpvp.nirvana.util.NirvanaUtils;
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -105,6 +112,8 @@ public class Nirvana extends JavaPlugin implements Listener {
         }
 
         registerListeners();
+
+        // registerNametagProvider();
     }
 
     @Override
@@ -293,6 +302,17 @@ public class Nirvana extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(new LobbyListeners(), this);
         Bukkit.getPluginManager().registerEvents(new LobbyProfileListeners(), this);
     }
+
+    /*
+    private void registerNametagProvider() {
+        FrozenNametagHandler.registerProvider(new NametagProvider("Nirvana-Lobby Nametag Provider", 2) {
+            @Override
+            public NametagInfo fetchNametag(Player target, Player viewer) {
+                return null;
+            }
+        });
+    }
+    */
 
     public static Nirvana getInstance() {
         return instance;
