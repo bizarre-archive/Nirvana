@@ -2,10 +2,11 @@ package com.veltpvp.nirvana.lobby;
 
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.gamemode.Gamemode;
-import com.veltpvp.nirvana.gamemode.menu.GameMenu;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
+import com.veltpvp.nirvana.menu.GameMenu;
+import com.veltpvp.nirvana.parties.event.PartyCreateEvent;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,11 +17,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.npc.event.PlayerInteractNPCEvent;
@@ -57,7 +54,17 @@ public class LobbyListeners implements Listener {
         event.setCancelled(true);
 
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID && event.getEntity() instanceof Player) {
-            event.getEntity().teleport(main.getLobby().getSpawnLocation());
+            LobbyProfile profile = LobbyProfile.getByPlayer((Player) event.getEntity());
+
+            if (profile != null && profile.getParkour() != null && profile.getParkour().getCheckpoint() != null) {
+                Location location = profile.getParkour().getCheckpoint().getLocation().clone();
+
+                location.setDirection(event.getEntity().getLocation().getDirection());
+
+                event.getEntity().teleport(location);
+            } else {
+                event.getEntity().teleport(main.getLobby().getSpawnLocation());
+            }
         }
     }
 
@@ -65,63 +72,68 @@ public class LobbyListeners implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         LobbyProfile profile = LobbyProfile.getByPlayer(player);
-
-        if (!event.hasItem()) {
-            return;
-        }
-
         ItemStack itemStack = event.getItem();
-
-        if (itemStack.getType() == Material.COMPASS) {
-            event.setCancelled(true);
-        }
 
         if (profile != null) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(true);
 
-                if (itemStack.equals(LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM)) {
+                if (itemStack != null) {
 
-                    Board board = Board.getByPlayer(player);
-                    if (board != null) {
-                        BoardCooldown cooldown = board.getCooldown("visibility");
+                    if (itemStack.equals(LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM)) {
 
-                        if (cooldown != null) {
-                            player.sendMessage(ChatColor.YELLOW + "You must wait " + ChatColor.RED + cooldown.getFormattedString(BoardFormat.SECONDS) + "s" + ChatColor.YELLOW + " before toggling visibility again.");
+                        Board board = Board.getByPlayer(player);
+                        if (board != null) {
+                            BoardCooldown cooldown = board.getCooldown("visibility");
+
+                            if (cooldown != null) {
+                                player.sendMessage(ChatColor.YELLOW + "You must wait " + ChatColor.RED + cooldown.getFormattedString(BoardFormat.SECONDS) + "s" + ChatColor.YELLOW + " before toggling visibility again.");
+                                return;
+                            }
+
+                            new BoardCooldown(board, "visibility", 5);
+                            player.setItemInHand(LobbyItems.TOGGLE_VISIBILITY_ON_ITEM);
+                            profile.setHidePlayers(!profile.isHidePlayers());
                             return;
                         }
-
-                        new BoardCooldown(board, "visibility", 5);
-                        player.setItemInHand(LobbyItems.TOGGLE_VISIBILITY_ON_ITEM);
-                        profile.setHidePlayers(!profile.isHidePlayers());
-                        return;
                     }
-                }
 
-                if (itemStack.equals(LobbyItems.TOGGLE_VISIBILITY_ON_ITEM)) {
-                    Board board = Board.getByPlayer(player);
-                    if (board != null) {
-                        BoardCooldown cooldown = board.getCooldown("visibility");
+                    if (itemStack.equals(LobbyItems.TOGGLE_VISIBILITY_ON_ITEM)) {
+                        Board board = Board.getByPlayer(player);
+                        if (board != null) {
+                            BoardCooldown cooldown = board.getCooldown("visibility");
 
-                        if (cooldown != null) {
-                            player.sendMessage(ChatColor.YELLOW + "You must wait " + ChatColor.RED + cooldown.getFormattedString(BoardFormat.SECONDS) + "s" + ChatColor.YELLOW + " before toggling visibility again.");
+                            if (cooldown != null) {
+                                player.sendMessage(ChatColor.YELLOW + "You must wait " + ChatColor.RED + cooldown.getFormattedString(BoardFormat.SECONDS) + "s" + ChatColor.YELLOW + " before toggling visibility again.");
+                                return;
+                            }
+
+                            new BoardCooldown(board, "visibility", 5);
+                            player.setItemInHand(LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM);
+                            profile.setHidePlayers(!profile.isHidePlayers());
                             return;
                         }
-
-                        new BoardCooldown(board, "visibility", 5);
-                        player.setItemInHand(LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM);
-                        profile.setHidePlayers(!profile.isHidePlayers());
                         return;
                     }
-                    return;
-                }
 
-                if (itemStack.equals(LobbyItems.LOBBY_SELECTOR)) {
-                    player.openInventory(new LobbyMenu(player, main.getLobbies()).getInventory());
-                    return;
-                }
+                    /*if (itemStack.equals(LobbyItems.LOBBY_SELECTOR)) {
+                        player.openInventory(new LobbyMenu(player, main.getLobbies()).getInventory());
+                        return;
+                    }*/
 
-                if (itemStack.equals(LobbyItems.GAME_SELECTOR)) {
-                    new GameMenu().openMenu(player);
+                    if (itemStack.equals(LobbyItems.PARTY_CREATOR)) {
+                        player.performCommand("party create");
+                        return;
+                    }
+
+                    if (itemStack.equals(LobbyItems.PARTY_DISBANDER)) {
+                        player.performCommand("party disband");
+                        return;
+                    }
+
+                    if (itemStack.equals(LobbyItems.INFORMATION_BOOK)) {
+                        player.openInventory(new GameMenu(player).getInventory());
+                    }
                 }
             }
         }
@@ -136,12 +148,7 @@ public class LobbyListeners implements Listener {
             Gamemode gamemode = Gamemode.getByNPC(event.getNpc());
 
             if (gamemode != null) {
-                if (profile.getQueue() != null) {
-                    player.sendMessage(ChatColor.RED + "You're already queueing for a game!");
-                    return;
-                }
-
-                gamemode.addToGame(profile);
+                main.getLobby().queue(player, gamemode);
             }
         }
     }
@@ -194,6 +201,26 @@ public class LobbyListeners implements Listener {
         if (event.getEntity() instanceof Animals) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPartyCreateEvent(PartyCreateEvent event) {
+        Player player = event.getLeader();
+
+        LobbyProfile profile = LobbyProfile.getByPlayer(player);
+
+        if (profile != null) {
+            profile.getMembers().put(player.getUniqueId(), player.getName());
+            player.getInventory().clear();
+            player.getInventory().setHeldItemSlot(0);
+
+            profile.setLeader(true);
+
+            player.getInventory().setItem(0, LobbyItems.INFORMATION_BOOK);
+            player.getInventory().setItem(8, LobbyItems.PARTY_DISBANDER);
+            player.updateInventory();
+        }
+
     }
 
 }

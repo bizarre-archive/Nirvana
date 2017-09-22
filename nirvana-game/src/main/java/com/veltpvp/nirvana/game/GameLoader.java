@@ -1,14 +1,8 @@
 package com.veltpvp.nirvana.game;
 
-import com.sk89q.worldedit.CuboidClipboard;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.data.DataException;
 import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.chest.GameChest;
 import com.veltpvp.nirvana.game.chest.GameChestTier;
-import net.minecraft.util.org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -20,12 +14,11 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import com.veltpvp.nirvana.game.chest.GameChest;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class GameLoader implements Listener {
 
@@ -34,13 +27,14 @@ public class GameLoader implements Listener {
     private String map;
     private int height;
 
-    public GameLoader(Nirvana main) {
+    public GameLoader(Nirvana main, String map) {
         this.spawnLocations = new ArrayList<>();
-        this.map = "N/A";
+        this.map = map;
+        this.height = 256;
 
         Bukkit.getPluginManager().registerEvents(this, main);
 
-        File folder = new File(main.getDataFolder() + File.separator + "schematics");
+        /*File folder = new File(main.getDataFolder() + File.separator + "schematics");
         if (!folder.exists()) {
             folder.mkdir();
             Bukkit.getLogger().warning("SCHEMATIC FOLDER DOES NOT EXIST, CREATING NOW.");
@@ -57,11 +51,11 @@ public class GameLoader implements Listener {
             Bukkit.getLogger().severe("NO SCHEMATICS FOUND, STOPPING SERVER.");
             Bukkit.getServer().shutdown();
             return;
-        }
+        }*/
 
         Location location = Bukkit.getWorlds().get(0).getSpawnLocation();
 
-        File file;
+        /*File file;
         CuboidClipboard clipboard;
         try {
             file = files.get(new Random().nextInt(files.size()));
@@ -83,7 +77,7 @@ public class GameLoader implements Listener {
         } catch (MaxChangedBlocksException e) {
             e.printStackTrace();
             return;
-        }
+        }*/
 
         for (Chunk chunk : location.getWorld().getLoadedChunks()) {
             for (BlockState state : chunk.getTileEntities()) {
@@ -135,9 +129,9 @@ public class GameLoader implements Listener {
             }
         }
 
-        height = clipboard.getHeight() + location.getWorld().getSpawnLocation().getBlockY();
+        /*height = clipboard.getHeight() + location.getWorld().getSpawnLocation().getBlockY();
 
-        System.out.println("Pasted " + file.getPath() + "!");
+        System.out.println("Pasted " + file.getPath() + "!");*/
 
         this.main = main;
     }

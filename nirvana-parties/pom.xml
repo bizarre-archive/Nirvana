@@ -9,9 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>nirvana-lobby</artifactId>
-    <name>nirvana-lobby</name>
-    <description>Skywars lobby plugin for the VeltPvP network</description>
+    <artifactId>nirvana-parties</artifactId>
+    <name>nirvana-parties</name>
+    <description>Skywars party plugin for the VeltPvP network</description>
     <version>1.0-SNAPSHOT</version>
 
     <build>
@@ -56,17 +56,10 @@
         </resources>
     </build>
 
-    <repositories>
-        <repository>
-            <id>md5-repo</id>
-            <url>http://repo.md-5.net/content/groups/public</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-lang</artifactId>
+            <groupId>com.veltpvp.nirvana</groupId>
+            <artifactId>nirvana-packet</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -77,48 +70,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>us.ikari</groupId>
-            <artifactId>Azazel</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>us.ikari.phoenix</groupId>
             <artifactId>phoenix-command</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-scoreboard</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-gui</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-gui</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-hologram</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-npc</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>us.ikari.phoenix</groupId>
-            <artifactId>phoenix-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -130,16 +83,10 @@
         </dependency>
         <dependency>
             <groupId>net.frozenorb</groupId>
-            <artifactId>Hydrogen</artifactId>
+            <artifactId>qLib</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.veltpvp.nirvana</groupId>
-            <artifactId>nirvana-parties</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
-
 
 </project>

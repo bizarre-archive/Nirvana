@@ -1,5 +1,6 @@
 package com.veltpvp.nirvana;
 
+import com.google.common.io.Files;
 import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.GameChunkGenerator;
 import com.veltpvp.nirvana.game.GameListeners;
@@ -27,6 +28,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import us.ikari.azazel.Azazel;
 import us.ikari.phoenix.gui.PhoenixGui;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
@@ -38,6 +40,8 @@ import us.ikari.phoenix.scoreboard.Aether;
 import us.ikari.phoenix.scoreboard.AetherOptions;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class Nirvana extends JavaPlugin implements Listener {
 
@@ -68,6 +72,15 @@ public class Nirvana extends JavaPlugin implements Listener {
         setNetworkStatus(NirvanaServerStatus.DEPLOYING);
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player online : Bukkit.getOnlinePlayers()) {
+                    online.setHealth(online.getHealth());
+                }
+            }
+        }.runTaskTimer(this, 2L, 2L);
 
         new GamePacketListeners();
 
@@ -144,18 +157,23 @@ public class Nirvana extends JavaPlugin implements Listener {
     @EventHandler
     public void onWorldLoadEvent(WorldLoadEvent event) {
         if (event.getWorld().getName().equals(WORLD_FILE_NAME)) {
-            setGame(new GameLoader(this).getGame());
+            File worldFolder = event.getWorld().getWorldFolder();
+            File worldNameFile = new File(worldFolder.getPath() + File.separator + "world-name");
+
+            String name;
+            try {
+                name = Files.readFirstLine(worldNameFile, Charset.defaultCharset());
+            } catch (IOException e) {
+                name = "N/A";
+            }
+
+            for (int x = -5; x <=5; x++) for (int z = -5; z <= 5; z++) event.getWorld().getChunkAt(x, z);
+
+            setGame(new GameLoader(this, name).getGame());
 
             for (Entity entity : event.getWorld().getEntities()) {
                 entity.remove();
             }
-        }
-    }
-
-    static {
-        File file = new File(Bukkit.getWorldContainer().getAbsolutePath() + File.separator + WORLD_FILE_NAME);
-        if (file.exists()) {
-            file.delete();
         }
     }
 

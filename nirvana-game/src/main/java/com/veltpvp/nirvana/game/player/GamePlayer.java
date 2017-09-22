@@ -1,10 +1,8 @@
 package com.veltpvp.nirvana.game.player;
 
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 import com.veltpvp.nirvana.Nirvana;
-import com.veltpvp.nirvana.game.GameState;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,10 +23,10 @@ public class GamePlayer {
     @Getter private final String name;
     @Getter private final GamePlayerData data;
 
-    public GamePlayer(UUID uuid, String name) {
+    public GamePlayer(UUID uuid, String name, String displayName) {
         this.uuid = uuid;
         this.name = name;
-        this.data = new GamePlayerData();
+        this.data = new GamePlayerData(displayName);
     }
 
     public String getKitName() {

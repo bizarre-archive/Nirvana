@@ -1,13 +1,12 @@
 package com.veltpvp.nirvana.game.tab;
 
 import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.game.Game;
 import com.veltpvp.nirvana.game.GameState;
 import com.veltpvp.nirvana.game.player.GamePlayer;
 import com.veltpvp.nirvana.game.task.GameStartTask;
-import com.veltpvp.nirvana.game.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import us.ikari.azazel.tab.TabAdapter;
 import us.ikari.azazel.tab.TabTemplate;
@@ -37,6 +36,11 @@ public class GameTabAdapter implements TabAdapter {
         toReturn.farRight(9, ChatColor.GREEN + "experience.");
 
         GamePlayer gamePlayer = game.getByPlayer(player);
+        
+        if (gamePlayer == null) {
+            return null;
+        }
+        
         if (game.getState() == GameState.LOBBY) {
             for (String line : main.getLangFile().getStringList("TAB." + (game.hasTask(GameStartTask.class) ? "LOBBY" : "LOBBY_WAITING") + ".LEFT", LanguageConfigurationFileLocale.ENGLISH, "N/A", gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
                 toReturn.left(line);
@@ -50,13 +54,13 @@ public class GameTabAdapter implements TabAdapter {
         }
 
         if (game.getState() == GameState.PLAY || game.getState() == GameState.END || game.getState() == GameState.DEATHMATCH) {
-            for (String line : main.getLangFile().getStringList("TAB.GAME.LEFT", LanguageConfigurationFileLocale.ENGLISH, player.getStatistic(Statistic.PLAYER_KILLS), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
+            for (String line : main.getLangFile().getStringList("TAB.GAME.LEFT", LanguageConfigurationFileLocale.ENGLISH, gamePlayer.getData().kills(), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
                 toReturn.left(line);
             }
-            for (String line : main.getLangFile().getStringList("TAB.GAME.MIDDLE", LanguageConfigurationFileLocale.ENGLISH, player.getStatistic(Statistic.PLAYER_KILLS), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
+            for (String line : main.getLangFile().getStringList("TAB.GAME.MIDDLE", LanguageConfigurationFileLocale.ENGLISH, gamePlayer.getData().kills(), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
                 toReturn.middle(line);
             }
-            for (String line : main.getLangFile().getStringList("TAB.GAME.RIGHT", LanguageConfigurationFileLocale.ENGLISH, player.getStatistic(Statistic.PLAYER_KILLS), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
+            for (String line : main.getLangFile().getStringList("TAB.GAME.RIGHT", LanguageConfigurationFileLocale.ENGLISH, gamePlayer.getData().kills(), gamePlayer != null ? gamePlayer.getKitName() : "N/A", game.getMap(), player.getLocation().getBlockX(), player.getLocation().getBlockZ(), getCardinalDirection(player), getPlayers(), game.getAlivePlayers().size(), getSpectators(), Bukkit.getServerName(), game.getGameTime().secondsLeft(main.getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN")) + 1)) {
                 toReturn.right(line);
             }
         }

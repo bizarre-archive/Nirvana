@@ -16,6 +16,10 @@ import com.veltpvp.nirvana.packet.lobby.LobbyServer;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerListPacket;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerRemovePacket;
 import com.veltpvp.nirvana.packet.lobby.LobbyServerStatusPacket;
+import com.veltpvp.nirvana.packet.party.PartyMember;
+import com.veltpvp.nirvana.packet.party.PartyUpdatePacket;
+import com.veltpvp.nirvana.parkour.ParkourListeners;
+import com.veltpvp.nirvana.parties.NirvanaParties;
 import com.veltpvp.nirvana.tab.NirvanaTabAdapter;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import com.veltpvp.nirvana.util.NirvanaUtils;
@@ -50,7 +54,6 @@ import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.network.packet.event.PacketListener;
 import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.RedisNetwork;
-import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.scoreboard.Aether;
@@ -85,7 +88,7 @@ public class Nirvana extends JavaPlugin implements Listener {
 
         Gamemode.load();
 
-        network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"));
+        network = NirvanaParties.getInstance().getNetwork();
         network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
         //network.registerThread(new RedisNetworkSubscribeThread(network, Nitrogen.REDIS_CHANNEL));
         network.registerPacketListener(this);
@@ -204,7 +207,7 @@ public class Nirvana extends JavaPlugin implements Listener {
                 LobbyProfile profile = LobbyProfile.getByPlayer(player);
                 if (profile != null) {
                     if (profile.getQueue() != null) {
-                        profile.setQueue(null);
+                        player.sendMessage(ChatColor.GREEN + "Sending you to " + packet.getServer() + "!");
                     }
                 }
             }
@@ -226,6 +229,56 @@ public class Nirvana extends JavaPlugin implements Listener {
                     if (profile != null) {
                         profile.setQueue(new LobbyProfileQueue(gamemode.getName(), System.currentTimeMillis()));
                         player.sendMessage(ChatColor.YELLOW + "You've been added to the " + ChatColor.LIGHT_PURPLE + gamemode.getName() + ChatColor.YELLOW + " SkyWars queue.");
+                    }
+                }
+            }
+        }
+
+    }
+
+    @PacketListener({PartyUpdatePacket.class})
+    public void onPartyUpdatePacketReceiveEvent(PacketReceiveEvent event) {
+        PartyUpdatePacket packet = (PartyUpdatePacket) event.getPacket();
+
+        if (packet.getType() == PartyUpdatePacket.PartyUpdateType.DISBAND) {
+            for (PartyMember member : packet.getParty().getMembers()) {
+                Player player = Bukkit.getPlayer(member.getUuid());
+
+                if (player != null) {
+                    lobby.setupPlayer(player, LobbyProfile.getByPlayer(player));
+                    LobbyProfile.getByPlayer(player).getMembers().clear();
+                    LobbyProfile.getByPlayer(player).setLeader(false);
+                }
+
+            }
+            return;
+        }
+
+        if (packet.getOptional() != null) {
+            Player player = Bukkit.getPlayer(packet.getOptional().getUuid());
+
+            if (player != null) {
+                LobbyProfile.getByPlayer(player).getMembers().clear();
+
+                if (packet.getParty().getMembers().contains(packet.getOptional())) {
+                    for (PartyMember partyMember : packet.getParty().getMembers()) {
+                        System.out.println(partyMember.getName());
+                        LobbyProfile.getByPlayer(player).getMembers().put(partyMember.getUuid(), partyMember.getName());
+                    }
+                }
+            }
+        }
+
+        if (packet.getType() == PartyUpdatePacket.PartyUpdateType.REMOVE_PLAYER_LEAVE || packet.getType() == PartyUpdatePacket.PartyUpdateType.REMOVE_PLAYER_KICK || packet.getType() == PartyUpdatePacket.PartyUpdateType.ADD_PLAYER) {
+            for (PartyMember member : packet.getParty().getMembers()) {
+                Player player = Bukkit.getPlayer(member.getUuid());
+
+                if (player != null) {
+                    LobbyProfile.getByPlayer(player).getMembers().clear();
+
+                    for (PartyMember partyMember : packet.getParty().getMembers()) {
+                        System.out.println(partyMember.getName());
+                        LobbyProfile.getByPlayer(player).getMembers().put(partyMember.getUuid(), partyMember.getName());
                     }
                 }
             }
@@ -270,6 +323,13 @@ public class Nirvana extends JavaPlugin implements Listener {
     public void onBootyCallPacketReceiveEvent(PacketReceiveEvent event) {
         for (LobbyProfile profile : LobbyProfile.getProfiles().values()) {
             profile.setQueue(null);
+            Player player = Bukkit.getPlayer(profile.getName());
+
+            if (player != null) {
+                lobby.setupPlayer(player, profile);
+                profile.getMembers().clear();
+            }
+
         }
         network.sendPacket(new LobbyServerStatusPacket(new LobbyServer(id, Bukkit.getOnlinePlayers().size(), Bukkit.getMaxPlayers(), System.currentTimeMillis())), NirvanaChannels.APPLICATION_CHANNEL, PacketDeliveryMethod.DIRECT);
     }
@@ -301,6 +361,7 @@ public class Nirvana extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         Bukkit.getPluginManager().registerEvents(new LobbyListeners(), this);
         Bukkit.getPluginManager().registerEvents(new LobbyProfileListeners(), this);
+        Bukkit.getPluginManager().registerEvents(new ParkourListeners(), this);
     }
 
     /*

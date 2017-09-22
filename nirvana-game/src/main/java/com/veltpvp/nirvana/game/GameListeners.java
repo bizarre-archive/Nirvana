@@ -10,8 +10,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import us.ikari.phoenix.lang.file.type.language.LanguageConfigurationFileLocale;
 
-import java.text.DecimalFormat;
-
 public class GameListeners implements Listener {
 
     private Nirvana main;
@@ -34,7 +32,10 @@ public class GameListeners implements Listener {
         if (event.getDamager() instanceof Arrow && event.getEntity() instanceof Player) {
             Arrow arrow = (Arrow) event.getDamager();
             if (arrow.getShooter() instanceof Player) {
-                ((Player) arrow.getShooter()).sendMessage(main.getLangFile().getString("GAME.HIT", LanguageConfigurationFileLocale.EXPLICIT, ((Player) event.getEntity()).getName(), new DecimalFormat("##.0").format((((Player) event.getEntity()).getHealth() - event.getFinalDamage()) / 2)));
+                double health = (((Player) event.getEntity()).getHealth() - event.getFinalDamage()) / 2;
+                if (health > 0) {
+                    ((Player) arrow.getShooter()).sendMessage(main.getLangFile().getString("GAME.HIT", LanguageConfigurationFileLocale.ENGLISH, ((Player) event.getEntity()).getDisplayName(), (Math.round(health * 2) / 2.0)));
+                }
             }
         }
     }

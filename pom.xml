@@ -17,6 +17,7 @@
         <module>nirvana-packet</module>
         <module>nirvana-proxy</module>
         <module>nirvana-lobby</module>
+        <module>nirvana-parties</module>
     </modules>
 
 
