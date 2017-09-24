@@ -123,7 +123,7 @@ public class GamePlayerListeners implements Listener {
 
             chest.getBlockInventory().addItem(new MenuItemBuilder(Material.GOLDEN_APPLE).name(ChatColor.GOLD + "" + ChatColor.BOLD + "Golden Head").build().getItemStack());
 
-            TileEntityChest entity = (TileEntityChest) ((CraftWorld)chest.getWorld()).getHandle().getTileEntity(chest.getLocation().getBlockX(), chest.getLocation().getBlockY(), chest.getLocation().getBlockZ());
+            TileEntityChest entity = (TileEntityChest) ((CraftWorld) chest.getWorld()).getHandle().getTileEntity(chest.getLocation().getBlockX(), chest.getLocation().getBlockY(), chest.getLocation().getBlockZ());
             entity.a(ChatColor.GOLD + player.getName() + (player.getName().endsWith("s") || player.getName().endsWith("z") ? "'" : "'s") + " Corpse");
 
             Block finalBlock = block;
@@ -172,6 +172,7 @@ public class GamePlayerListeners implements Listener {
 
                 if (cooldown != null) {
                     player.sendMessage(ChatColor.RED + "You must wait " + ChatColor.YELLOW + cooldown.getFormattedString(BoardFormat.SECONDS) + "s" + ChatColor.RED + " before pearling again!");
+                    player.updateInventory();
                     event.setCancelled(true);
                     return;
                 }
@@ -284,7 +285,7 @@ public class GamePlayerListeners implements Listener {
 
                 TNTPrimed primed = player.getWorld().spawn(player.getLocation().clone().add(0, 2, 0), TNTPrimed.class);
 
-                primed.setFuseTicks(50);
+                primed.setFuseTicks(25);
                 primed.setVelocity(player.getLocation().getDirection().multiply(0.85));
 
                 new BoardCooldown(board, "bomb", 5);
@@ -357,7 +358,7 @@ public class GamePlayerListeners implements Listener {
     public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
         Player player = (Player) event.getEntity();
         if (event.getFoodLevel() < player.getFoodLevel()) {
-            if (new Random().nextInt(2) == 1) {
+            if (new Random().nextInt(3) == 1) {
                 event.setCancelled(true);
             }
         }

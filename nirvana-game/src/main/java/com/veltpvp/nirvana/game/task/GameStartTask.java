@@ -24,7 +24,7 @@ import java.util.Random;
 
 public class GameStartTask extends BukkitRunnable {
 
-    private static final long DEFAULT_DURATION = Nirvana.getInstance().getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN");
+    public static final long DEFAULT_DURATION = Nirvana.getInstance().getConfigFile().getInteger("STATE.LOBBY.COUNTDOWN");
 
     @Getter private final Game game;
     @Getter private long duration;
@@ -93,43 +93,43 @@ public class GameStartTask extends BukkitRunnable {
 
         for (GameEventStage stage : GameEventStage.values()) {
             if (stage != GameEventStage.NONE) {
-               new BukkitRunnable() {
-                   @Override
-                   public void run() {
-                       game.setRefillStage(stage);
-                       if (stage != GameEventStage.DEATHMATCH) {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        game.setRefillStage(stage);
+                        if (stage != GameEventStage.DEATHMATCH) {
 
-                           GameChest.getLoadedChests().clear();
-                           if (stage == GameEventStage.SECOND_REFILL) {
+                            GameChest.getLoadedChests().clear();
+                            if (stage == GameEventStage.SECOND_REFILL) {
 
                               /* for (Location chest : GameChest.BASIC.getInstances()) {
                                    GameChest.BUFFED.getInstances().add(chest);
                                } TODO
 
                                GameChest.BASIC.getInstances().clear();*/
-                           }
+                            }
 
-                           for (Player player : Bukkit.getOnlinePlayers()) {
-                               player.sendMessage(Nirvana.getInstance().getLangFile().getString("GAME.EVENT.REFILL", LanguageConfigurationFileLocale.ENGLISH));
-                           }
-                       } else {
-                           new BukkitRunnable() {
-                               @Override
-                               public void run() {
-                                   for (GamePlayer gamePlayer : game.getPlayers()) {
-                                       if (gamePlayer.getData().alive()) {
-                                           Player player = Bukkit.getPlayer(gamePlayer.getName());
-                                           if (player != null) {
-                                               TNTPrimed tnt = player.getWorld().spawn(new Location(player.getWorld(), (new Random().nextInt(10) - 5 + player.getLocation().getBlockX()), player.getLocation().getBlockY() + 50, new Random().nextInt(10) - 5 + player.getLocation().getBlockZ()), TNTPrimed.class);
-                                               tnt.setFuseTicks(120);
-                                           }
-                                       }
-                                   }
-                               }
-                           }.runTaskTimer(Nirvana.getInstance(), 0, (Nirvana.getInstance().getConfigFile().getInteger("STATE.EVENT.DEATHMATCH.PERIOD") / 1000) * 20);
-                       }
-                   }
-               }.runTaskLater(Nirvana.getInstance(), ((GameEventStage.getDuration(stage) + GameEventStage.getCountdown(stage)) / 1000) * 20);
+                            for (Player player : Bukkit.getOnlinePlayers()) {
+                                player.sendMessage(Nirvana.getInstance().getLangFile().getString("GAME.EVENT.REFILL", LanguageConfigurationFileLocale.ENGLISH));
+                            }
+                        } else {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    for (GamePlayer gamePlayer : game.getPlayers()) {
+                                        if (gamePlayer.getData().alive()) {
+                                            Player player = Bukkit.getPlayer(gamePlayer.getName());
+                                            if (player != null) {
+                                                TNTPrimed tnt = player.getWorld().spawn(new Location(player.getWorld(), (new Random().nextInt(10) - 5 + player.getLocation().getBlockX()), player.getLocation().getBlockY() + 50, new Random().nextInt(10) - 5 + player.getLocation().getBlockZ()), TNTPrimed.class);
+                                                tnt.setFuseTicks(120);
+                                            }
+                                        }
+                                    }
+                                }
+                            }.runTaskTimer(Nirvana.getInstance(), 0, (Nirvana.getInstance().getConfigFile().getInteger("STATE.EVENT.DEATHMATCH.PERIOD") / 1000) * 20);
+                        }
+                    }
+                }.runTaskLater(Nirvana.getInstance(), ((GameEventStage.getDuration(stage) + GameEventStage.getCountdown(stage)) / 1000) * 20);
             }
         }
     }

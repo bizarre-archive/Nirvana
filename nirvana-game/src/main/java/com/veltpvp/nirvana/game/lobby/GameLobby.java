@@ -47,7 +47,7 @@ public class GameLobby {
             player.removePotionEffect(effect.getType());
         }
 
-        player.getInventory().setHeldItemSlot(0);;
+        player.getInventory().setHeldItemSlot(0);
         player.getInventory().setItem(0, getKitSelector(LanguageConfigurationFileLocale.ENGLISH)); //TODO Change
     }
 

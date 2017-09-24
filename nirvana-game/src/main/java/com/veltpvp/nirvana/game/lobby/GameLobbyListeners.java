@@ -79,6 +79,28 @@ public class GameLobbyListeners implements Listener {
                 }
             }
 
+            if (game.hasTask(GameStartTask.class)) {
+                long duration = GameStartTask.DEFAULT_DURATION;
+
+                for (int i = 1; i <= game.getAlivePlayers().size(); i++) {
+
+                    if (i <= (game.getLobby().getSpawnLocations().size() / 2)) {
+                        continue;
+                    }
+
+                    duration -= 5;
+                }
+
+                duration = Math.max(10, duration);
+
+                BukkitRunnable runnable = game.getTask(GameStartTask.class);
+
+                runnable.cancel();
+                game.getActiveTasks().remove(runnable);
+
+                game.getActiveTasks().add(new GameStartTask(game, duration));
+            }
+
         } else {
             //TODO: Throw into spectate mode??
         }

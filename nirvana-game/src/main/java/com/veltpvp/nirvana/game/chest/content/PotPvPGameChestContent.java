@@ -62,6 +62,8 @@ public class PotPvPGameChestContent implements GameChestContent {
             toReturn.add(new MenuItemBuilder(Material.POTION).durability(16420).build().getItemStack());
             toReturn.add(new MenuItemBuilder(Material.POTION).durability(16426).build().getItemStack());
 
+            toReturn.add(new MenuItemBuilder(Material.POTION).durability(8259).build().getItemStack());
+
             toReturn.add(new ItemStack(Material.ENDER_PEARL, RANDOM.nextInt(4) + 1));
         }
 
