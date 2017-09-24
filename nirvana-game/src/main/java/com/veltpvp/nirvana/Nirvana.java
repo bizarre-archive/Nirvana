@@ -64,7 +64,7 @@ public class Nirvana extends JavaPlugin implements Listener {
 
         configFile = new BasicConfigurationFile(this, "config", false);
         langFile = new LanguageConfigurationFile(this, "lang", true);
-        network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"), ServerInfoPacket.class.getClassLoader());
+        network = new RedisNetwork(new RedisNetworkConfiguration("142.44.138.178"), ServerInfoPacket.class.getClassLoader());
         phoenixGui = new PhoenixGui(this);
         mongo = new NirvanaDatabase(this);
 

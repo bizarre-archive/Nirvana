@@ -24,6 +24,7 @@ public class PartyCreateCommand extends BasePartyCommand {
                 if (packet instanceof ErrorPacket) {
                     player.sendMessage(ChatColor.RED + ((ErrorPacket) packet).getError());
                 } else {
+                    player.sendMessage(ChatColor.YELLOW + "You've " + ChatColor.GREEN + "successfully" + ChatColor.YELLOW + " created a party.");
                     Bukkit.getPluginManager().callEvent(new PartyCreateEvent(player));
                 }
             }

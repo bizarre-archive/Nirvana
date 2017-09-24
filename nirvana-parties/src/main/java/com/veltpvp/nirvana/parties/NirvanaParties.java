@@ -1,5 +1,6 @@
 package com.veltpvp.nirvana.parties;
 
+import com.veltpvp.nirvana.packet.NirvanaChannels;
 import com.veltpvp.nirvana.packet.party.PartyMember;
 import com.veltpvp.nirvana.packet.party.PartyUpdatePacket;
 import com.veltpvp.nirvana.parties.command.*;
@@ -13,6 +14,7 @@ import us.ikari.phoenix.network.packet.event.PacketListener;
 import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
+import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
 
 public class NirvanaParties extends JavaPlugin {
 
@@ -24,7 +26,9 @@ public class NirvanaParties extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-        network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"));
+        network = new RedisNetwork(new RedisNetworkConfiguration("142.44.138.178"));
+        network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
+
         network.registerPacketListener(this);
         framework = new CommandFramework(this);
 

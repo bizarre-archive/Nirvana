@@ -43,15 +43,6 @@
             <goals>
               <goal>shade</goal>
             </goals>
-            <configuration>
-              <minimizeJar>false</minimizeJar>
-              <relocations>
-                <relocation>
-                  <pattern>us.ikari.phoenix.network</pattern>
-                  <shadedPattern>com.veltpvp.nirvana.shaded.us.ikari.phoenix.network</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -119,36 +110,6 @@
       <artifactId>Hydrogen</artifactId>
       <version>1.0</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>powerspigot-api</artifactId>
-          <groupId>net.frozenorb</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>Skylands</artifactId>
-          <groupId>net.frozenorb</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.frozenorb</groupId>
-      <artifactId>qLib</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>powerspigot-server</artifactId>
-          <groupId>net.frozenorb</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ProtocolLib</artifactId>
-          <groupId>com.comphenix.protocol</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>powerspigot-api</artifactId>
-          <groupId>net.frozenorb</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
 </project>

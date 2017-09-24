@@ -399,7 +399,7 @@ public class GamePlayerListeners implements Listener {
             Player player = (Player) event.getEntity();
             GamePlayer gamePlayer = game.getByPlayer(player);
 
-            if (gamePlayer.getData().alive()) {
+            if (gamePlayer != null && gamePlayer.getData().alive()) {
                 event.setCancelled(true);
                 player.damage(player.getMaxHealth());
             }

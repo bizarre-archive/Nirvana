@@ -47,7 +47,7 @@ public class GamePlayer {
 
         Document document = new Document();
 
-        document.put("uuid", uuid.toString());
+        document.put("_id", uuid.toString());
         document.put("totalKills", kills);
         document.put("totalDeaths", deaths);
 
@@ -79,7 +79,7 @@ public class GamePlayer {
             document.put(type.name().toLowerCase(), field);
         }
 
-        collection.replaceOne(eq("uuid", uuid.toString()), document, new UpdateOptions().upsert(true));
+        collection.replaceOne(eq("_id", uuid.toString()), document, new UpdateOptions().upsert(true));
     }
 
     private static class GamePlayerDatabaseFragment {
@@ -97,7 +97,7 @@ public class GamePlayer {
         }
 
         public static GamePlayerDatabaseFragment get(UUID uuid, MongoCollection collection) {
-            Document document = (Document) collection.find(eq("uuid", uuid.toString())).first();
+            Document document = (Document) collection.find(eq("_id", uuid.toString())).first();
 
             if (document != null) {
                 int totalKills = document.getInteger("totalKills");

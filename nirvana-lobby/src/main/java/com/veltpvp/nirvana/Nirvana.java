@@ -24,11 +24,7 @@ import com.veltpvp.nirvana.tab.NirvanaTabAdapter;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import com.veltpvp.nirvana.util.NirvanaUtils;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -54,7 +50,6 @@ import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.network.packet.event.PacketListener;
 import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.redis.RedisNetwork;
-import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.scoreboard.Aether;
 import us.ikari.phoenix.scoreboard.AetherOptions;
@@ -89,7 +84,6 @@ public class Nirvana extends JavaPlugin implements Listener {
         Gamemode.load();
 
         network = NirvanaParties.getInstance().getNetwork();
-        network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
         //network.registerThread(new RedisNetworkSubscribeThread(network, Nitrogen.REDIS_CHANNEL));
         network.registerPacketListener(this);
 

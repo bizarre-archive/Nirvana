@@ -695,7 +695,7 @@ public class Nirvana {
     }
 
     public static void main(String[] args) {
-        new Nirvana(new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2")));
+        new Nirvana(new RedisNetwork(new RedisNetworkConfiguration("142.44.138.178")));
     }
 
 }

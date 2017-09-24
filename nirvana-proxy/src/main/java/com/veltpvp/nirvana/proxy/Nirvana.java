@@ -44,7 +44,7 @@ public class Nirvana extends Plugin implements Listener {
         ProxyServer.getInstance().getScheduler().runAsync(this, new Runnable() {
             @Override
             public void run() {
-                network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"), Nirvana.class.getClassLoader());
+                network = new RedisNetwork(new RedisNetworkConfiguration("142.44.138.178"), Nirvana.class.getClassLoader());
                 network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
                 network.registerPacketListener(Nirvana.this);
             }

@@ -7,6 +7,6 @@ GAMEMODES:
   POTPVP:
     NAME: "PotPvP"
 MONGO:
-  HOST: 10.0.9.2
+  HOST: 142.44.138.178
   PORT: 27017
   DATABASE: "skywars"

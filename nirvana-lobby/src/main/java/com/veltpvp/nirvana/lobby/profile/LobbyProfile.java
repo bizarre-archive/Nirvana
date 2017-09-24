@@ -153,7 +153,7 @@ public class LobbyProfile {
         }
 
         public static GamePlayerDatabaseFragment get(UUID uuid, MongoCollection collection) {
-            Document document = (Document) collection.find(eq("uuid", uuid.toString())).first();
+            Document document = (Document) collection.find(eq("_id", uuid.toString())).first();
 
             if (document != null) {
                 int totalKills = document.getInteger("totalKills");

@@ -1,25 +1,12 @@
 package com.veltpvp.nirvana.gamemode;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.veltpvp.nirvana.Nirvana;
-import com.veltpvp.nirvana.lobby.LobbyProfileQueue;
-import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
-import com.veltpvp.nirvana.packet.NirvanaChannels;
-import com.veltpvp.nirvana.packet.ServerQueuePacket;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import us.ikari.phoenix.gui.menu.item.MenuItemBuilder;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;
-import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.npc.NPC;
 
 import java.util.ArrayList;
@@ -29,18 +16,6 @@ public class Gamemode {
 
     private static Nirvana main = Nirvana.getInstance();
     private static List<Gamemode> gamemodes = new ArrayList<>();
-
-    /*
-    \u00BB
-    \u00AB
-     */
-
-    private static final String ARROW_RIGHT = ChatColor.GRAY + "»";
-    private static final String ARROW_LEFT = ChatColor.GRAY + "«";
-
-    private static final ItemStack UHC_ITEM = new MenuItemBuilder(Material.GOLDEN_APPLE).durability(1).name(ARROW_RIGHT + " &6&lUHC &d&lSkyWars " + ARROW_LEFT).build().getItemStack();
-    private static final ItemStack CLASSIC_ITEM = new MenuItemBuilder(Material.DIAMOND_SWORD).enchantment(Enchantment.DAMAGE_ALL, 1).name(ARROW_RIGHT + " &c&lClassic &d&lSkyWars " + ARROW_LEFT).build().getItemStack();
-    private static final ItemStack POTPVP_ITEM = new MenuItemBuilder(Material.POTION).durability(16421).name(ARROW_RIGHT + " &e&lPotPvP &d&lSkyWars" + ARROW_LEFT).build().getItemStack();
 
     @Getter private final String id;
     @Getter private final String name;
@@ -56,44 +31,6 @@ public class Gamemode {
         gamemodes.add(this);
     }
 
-    public void addToGame(LobbyProfile profile) {
-        Player player = profile.getPlayer();
-
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
-        out.writeUTF("sendToNirvanaGame");
-        out.writeUTF(id);
-
-        if (profile.getMembers().isEmpty()) {
-            out.writeInt(1);
-            out.writeUTF(player.getName());
-        } else {
-            int i = 0;
-            for (String name : profile.getMembers().values()) {
-
-                if (i == 0) {
-                    if (!(name.equalsIgnoreCase(player.getName()))) {
-                        player.sendMessage(ChatColor.RED + "You must be the leader in order to summon your party into a game.");
-                        return;
-                    } else {
-                        out.writeInt(profile.getMembers().size());
-                    }
-                }
-
-                out.writeUTF(name);
-                i++;
-            }
-        }
-
-        player.sendPluginMessage(main, "BungeeCord", out.toByteArray());
-
-        if (!profile.getMembers().isEmpty()) {
-            main.getNetwork().sendPacket(new ServerQueuePacket(id, new ArrayList<>(profile.getMembers().values())), NirvanaChannels.SLAVE_CHANNEL, PacketDeliveryMethod.CLUSTER);
-        } else {
-            profile.setQueue(new LobbyProfileQueue(name, System.currentTimeMillis()));
-            player.sendMessage(ChatColor.YELLOW + "You've been added to the " + ChatColor.LIGHT_PURPLE + name + ChatColor.YELLOW + " SkyWars queue.");
-        }
-    }
-
     public Location getExactNPCLocation() {
         Location location = npcLocation;
         if (location != null) {
@@ -101,12 +38,6 @@ public class Gamemode {
         }
 
         return null;
-    }
-
-    public ItemStack getItem() {
-        return name.equalsIgnoreCase("uhc") ? UHC_ITEM :
-                name.equalsIgnoreCase("classic") ? CLASSIC_ITEM :
-                        POTPVP_ITEM;
     }
 
     public static Gamemode getById(String id) {
