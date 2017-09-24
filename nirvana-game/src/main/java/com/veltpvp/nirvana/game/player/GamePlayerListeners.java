@@ -285,7 +285,7 @@ public class GamePlayerListeners implements Listener {
 
                 TNTPrimed primed = player.getWorld().spawn(player.getLocation().clone().add(0, 2, 0), TNTPrimed.class);
 
-                primed.setFuseTicks(50);
+                primed.setFuseTicks(25);
                 primed.setVelocity(player.getLocation().getDirection().multiply(0.85));
 
                 new BoardCooldown(board, "bomb", 5);
@@ -310,7 +310,7 @@ public class GamePlayerListeners implements Listener {
 
                 block.setType(Material.AIR);
                 TNTPrimed tnt = block.getWorld().spawn(block.getLocation().clone().add(0.5, 1.5, 0.5), TNTPrimed.class);
-                tnt.setFuseTicks(8);
+                tnt.setFuseTicks(15);
 
                 new BoardCooldown(board, "bomb", 5);
             }
