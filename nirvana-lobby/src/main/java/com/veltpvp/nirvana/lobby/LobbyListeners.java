@@ -1,13 +1,12 @@
 package com.veltpvp.nirvana.lobby;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.gamemode.Gamemode;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
-import com.veltpvp.nirvana.packet.NirvanaChannels;
-import com.veltpvp.nirvana.packet.ServerQueuePacket;
+import com.veltpvp.nirvana.menu.GameMenu;
+import com.veltpvp.nirvana.parties.event.PartyCreateEvent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +19,6 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
-import us.ikari.phoenix.network.packet.PacketDeliveryMethod;
 import us.ikari.phoenix.npc.NPC;
 import us.ikari.phoenix.npc.event.PlayerInteractNPCEvent;
 import us.ikari.phoenix.scoreboard.scoreboard.Board;
@@ -56,7 +54,17 @@ public class LobbyListeners implements Listener {
         event.setCancelled(true);
 
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID && event.getEntity() instanceof Player) {
-            event.getEntity().teleport(main.getLobby().getSpawnLocation());
+            LobbyProfile profile = LobbyProfile.getByPlayer((Player) event.getEntity());
+
+            if (profile != null && profile.getParkour() != null && profile.getParkour().getCheckpoint() != null) {
+                Location location = profile.getParkour().getCheckpoint().getLocation().clone();
+
+                location.setDirection(event.getEntity().getLocation().getDirection());
+
+                event.getEntity().teleport(location);
+            } else {
+                event.getEntity().teleport(main.getLobby().getSpawnLocation());
+            }
         }
     }
 
@@ -68,6 +76,8 @@ public class LobbyListeners implements Listener {
 
         if (profile != null) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(true);
+
                 if (itemStack != null) {
 
                     if (itemStack.equals(LobbyItems.TOGGLE_VISIBILITY_OFF_ITEM)) {
@@ -106,9 +116,23 @@ public class LobbyListeners implements Listener {
                         return;
                     }
 
-                    if (itemStack.equals(LobbyItems.LOBBY_SELECTOR)) {
+                    /*if (itemStack.equals(LobbyItems.LOBBY_SELECTOR)) {
                         player.openInventory(new LobbyMenu(player, main.getLobbies()).getInventory());
                         return;
+                    }*/
+
+                    if (itemStack.equals(LobbyItems.PARTY_CREATOR)) {
+                        player.performCommand("party create");
+                        return;
+                    }
+
+                    if (itemStack.equals(LobbyItems.PARTY_DISBANDER)) {
+                        player.performCommand("party disband");
+                        return;
+                    }
+
+                    if (itemStack.equals(LobbyItems.INFORMATION_BOOK)) {
+                        player.openInventory(new GameMenu(player).getInventory());
                     }
                 }
             }
@@ -124,45 +148,7 @@ public class LobbyListeners implements Listener {
             Gamemode gamemode = Gamemode.getByNPC(event.getNpc());
 
             if (gamemode != null) {
-                if (profile.getQueue() != null) {
-                    player.sendMessage(ChatColor.RED + "You're already queueing for a game!");
-                    return;
-                }
-
-                ByteArrayDataOutput out = ByteStreams.newDataOutput();
-                out.writeUTF("sendToNirvanaGame");
-                out.writeUTF(gamemode.getId());
-
-                if (profile.getMembers().isEmpty()) {
-                    out.writeInt(1);
-                    out.writeUTF(player.getName());
-                } else {
-                    int i = 0;
-                    for (String name : profile.getMembers().values()) {
-
-                        if (i == 0) {
-                            if (!(name.equalsIgnoreCase(player.getName()))) {
-                                player.sendMessage(ChatColor.RED + "You must be the leader in order to summon your party into a game.");
-                                return;
-                            } else {
-                                out.writeInt(profile.getMembers().size());
-                            }
-                        }
-
-                        out.writeUTF(name);
-
-                        i++;
-                    }
-                }
-
-                player.sendPluginMessage(main, "BungeeCord", out.toByteArray());
-
-                if (!profile.getMembers().isEmpty()) {
-                    main.getNetwork().sendPacket(new ServerQueuePacket(gamemode.getId(), new ArrayList<>(profile.getMembers().values())), NirvanaChannels.SLAVE_CHANNEL, PacketDeliveryMethod.CLUSTER);
-                } else {
-                    profile.setQueue(new LobbyProfileQueue(gamemode.getName(), System.currentTimeMillis()));
-                    player.sendMessage(ChatColor.YELLOW + "You've been added to the " + ChatColor.LIGHT_PURPLE + gamemode.getName() + ChatColor.YELLOW + " SkyWars queue.");
-                }
+                main.getLobby().queue(player, gamemode);
             }
         }
     }
@@ -215,6 +201,26 @@ public class LobbyListeners implements Listener {
         if (event.getEntity() instanceof Animals) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPartyCreateEvent(PartyCreateEvent event) {
+        Player player = event.getLeader();
+
+        LobbyProfile profile = LobbyProfile.getByPlayer(player);
+
+        if (profile != null) {
+            profile.getMembers().put(player.getUniqueId(), player.getName());
+            player.getInventory().clear();
+            player.getInventory().setHeldItemSlot(0);
+
+            profile.setLeader(true);
+
+            player.getInventory().setItem(0, LobbyItems.INFORMATION_BOOK);
+            player.getInventory().setItem(8, LobbyItems.PARTY_DISBANDER);
+            player.updateInventory();
+        }
+
     }
 
 }

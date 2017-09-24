@@ -75,13 +75,28 @@ public class Game {
                 Player winner = Bukkit.getPlayer(getAlivePlayers().get(0).getName());
                 getAlivePlayers().get(0).getData().won(true);
 
-
                 for (GamePlayer gamePlayer : getPlayers()) {
                     gamePlayer.save();
                 }
 
+                List<GamePlayer> topKillers = players;
+                topKillers.sort((o1, o2) -> o2.getData().kills() - o1.getData().kills());
+
+                GamePlayer topKiller = topKillers.get(0);
+                GamePlayer secondPlace = topKillers.size() >= 2 ? topKillers.get(1) : null;
+                GamePlayer thirdPlace = topKillers.size() >= 3 ? topKillers.get(2) :  null;
+
+                String topKillerName = topKiller.getData().displayName();
+                String secondPlaceName = secondPlace == null ? null : secondPlace.getData().displayName();
+                String thirdPlaceName = thirdPlace == null ? null : thirdPlace.getData().displayName();
+
+                String topKills = topKiller.getData().kills() + (topKiller.getData().kills() == 1 ? " Kill" : " Kills");
+                String secondPlaceKills = secondPlace == null ? null : secondPlace.getData().kills() + (secondPlace.getData().kills() == 1 ? " Kill" : " Kills");
+                String thirdPlaceKills = thirdPlace == null ? null : thirdPlace.getData().kills() + (thirdPlace.getData().kills() == 1 ? " Kill" : " Kills");
+
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    for (String message : Nirvana.getInstance().getLangFile().getStringList("GAME.WON", LanguageConfigurationFileLocale.ENGLISH, winner.getDisplayName(), winner.getDisplayName())) {
+                    for (String message : Nirvana.getInstance().getLangFile().getStringListWithArgumentsOrRemove("GAME.WON", LanguageConfigurationFileLocale.ENGLISH, winner.getDisplayName(), getAlivePlayers().get(0).getData().kills() + (getAlivePlayers().get(0).getData().kills() == 1 ? " Kill" : " Kills"),
+                            topKillerName, secondPlaceName, thirdPlaceName, topKills, secondPlaceKills, thirdPlaceKills)) {
                         player.sendMessage(message);
                     }
                 }

@@ -1,6 +1,8 @@
 main: com.veltpvp.nirvana.Nirvana
 name: ${project.name}
 description: ${project.description}
+depend: [ qLib ]
 version: ${project.version}
 author: BizarreAlex
+depend: [nirvana-parties]
 load: STARTUP

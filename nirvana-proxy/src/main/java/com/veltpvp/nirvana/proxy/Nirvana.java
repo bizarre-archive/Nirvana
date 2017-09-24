@@ -9,6 +9,7 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerDisconnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -19,6 +20,7 @@ import us.ikari.phoenix.network.packet.event.PacketListener;
 import us.ikari.phoenix.network.packet.event.PacketReceiveEvent;
 import us.ikari.phoenix.network.packet.handler.PacketExceptionHandler;
 import us.ikari.phoenix.network.packet.handler.PacketResponseHandler;
+import us.ikari.phoenix.network.rabbit.listener.RabbitNetworkDeliveryType;
 import us.ikari.phoenix.network.redis.RedisNetwork;
 import us.ikari.phoenix.network.redis.RedisNetworkConfiguration;
 import us.ikari.phoenix.network.redis.thread.RedisNetworkSubscribeThread;
@@ -42,7 +44,7 @@ public class Nirvana extends Plugin implements Listener {
         ProxyServer.getInstance().getScheduler().runAsync(this, new Runnable() {
             @Override
             public void run() {
-                network = new RedisNetwork(new RedisNetworkConfiguration("10.0.9.2"), Nirvana.class.getClassLoader());
+                network = new RedisNetwork(new RedisNetworkConfiguration("142.44.138.178"), Nirvana.class.getClassLoader());
                 network.registerThread(new RedisNetworkSubscribeThread(network, NirvanaChannels.SLAVE_CHANNEL));
                 network.registerPacketListener(Nirvana.this);
             }
@@ -63,6 +65,7 @@ public class Nirvana extends Plugin implements Listener {
 
         System.out.println(player.getName() + " IS DISCONNECTING");
         System.out.println(playerQueue.keySet().toString());
+        network.sendPacket(new PlayerDisconnectPacket(player.getName(), player.getUniqueId()), NirvanaChannels.APPLICATION_CHANNEL, RabbitNetworkDeliveryType.DIRECT);
         for (List<String> players : playerQueue.keySet()) {
             System.out.println(players.toString());
             if (players.contains(player.getName())) {
@@ -71,6 +74,13 @@ public class Nirvana extends Plugin implements Listener {
                 break;
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerSwitchServerConnectEvent(ServerConnectEvent event) {
+        ProxiedPlayer player = event.getPlayer();
+
+        network.sendPacket(new PlayerSwitchServerPacket(player.getName(), player.getUniqueId(), event.getTarget().getName()), NirvanaChannels.APPLICATION_CHANNEL, RabbitNetworkDeliveryType.DIRECT);
     }
 
     @EventHandler //TODO: Cancel thread on application's end
@@ -180,14 +190,6 @@ public class Nirvana extends Plugin implements Listener {
 
                 System.out.println("players = " + players.toString());
 
-                Iterator<String> iterator = players.iterator();
-                while (iterator.hasNext()) {
-                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(iterator.next());
-                    if (player == null) {
-                        iterator.remove();
-                    }
-                }
-
                 System.out.println("Sending packet..");
 
                 network.sendPacket(new ServerSelectPacket(NirvanaServerType.LOBBY, players), NirvanaChannels.APPLICATION_CHANNEL, PacketDeliveryMethod.DIRECT, 10000, new PacketResponseHandler() {
@@ -248,14 +250,6 @@ public class Nirvana extends Plugin implements Listener {
                 }
 
                 System.out.println("players = " + players.toString());
-
-                Iterator<String> iterator = players.iterator();
-                while (iterator.hasNext()) {
-                    ProxiedPlayer player = ProxyServer.getInstance().getPlayer(iterator.next());
-                    if (player == null) {
-                        iterator.remove();
-                    }
-                }
 
                 System.out.println("Sending packet..");
 

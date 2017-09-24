@@ -4,7 +4,6 @@ import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.packet.lobby.LobbyServer;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,32 +45,29 @@ public class LobbyMenu extends PlayerMenu {
                     ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------",
                     ChatColor.YELLOW + "Players: " + ChatColor.WHITE + lobby.getPlayers() + ChatColor.GRAY + " / " + ChatColor.WHITE + lobby.getMaxPlayers(),
                     ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "-------------------------"
-            ).build().setCallback(ClickType.LEFT, new Runnable() {
-                @Override
-                public void run() {
-                    player.closeInventory();
+            ).build().setCallback(ClickType.LEFT, () -> {
+                player.closeInventory();
 
-                    if (lobby.getId().equalsIgnoreCase(Nirvana.getInstance().getId())) {
-                        player.sendMessage(ChatColor.RED + "You're already connected to this lobby.");
-                    } else {
-                        if (lobby.getPlayers() >= lobby.getMaxPlayers()) {
-                            player.sendMessage(ChatColor.RED + "This lobby is currently full!");
-                            return;
-                        }
-
-                        ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
-                        DataOutputStream out = new DataOutputStream(byteArray);
-
-                        try {
-                            out.writeUTF("Connect");
-                            out.writeUTF(lobby.getId());
-                        } catch (IOException ex) {
-                            player.sendMessage(ChatColor.RED + "An error occurred.");
-                            return;
-                        }
-
-                        player.sendPluginMessage(Nirvana.getInstance(), "BungeeCord", byteArray.toByteArray());
+                if (lobby.getId().equalsIgnoreCase(Nirvana.getInstance().getId())) {
+                    player.sendMessage(ChatColor.RED + "You're already connected to this lobby.");
+                } else {
+                    if (lobby.getPlayers() >= lobby.getMaxPlayers()) {
+                        player.sendMessage(ChatColor.RED + "This lobby is currently full!");
+                        return;
                     }
+
+                    ByteArrayOutputStream byteArray = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(byteArray);
+
+                    try {
+                        out.writeUTF("Connect");
+                        out.writeUTF(lobby.getId());
+                    } catch (IOException ex) {
+                        player.sendMessage(ChatColor.RED + "An error occurred.");
+                        return;
+                    }
+
+                    player.sendPluginMessage(Nirvana.getInstance(), "BungeeCord", byteArray.toByteArray());
                 }
             }));
         }

@@ -4,7 +4,6 @@ import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.util.LocationSerialization;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import us.ikari.phoenix.lang.file.type.BasicConfigurationFile;

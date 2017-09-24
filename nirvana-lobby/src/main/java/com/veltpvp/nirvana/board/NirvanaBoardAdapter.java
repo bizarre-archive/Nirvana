@@ -2,6 +2,7 @@ package com.veltpvp.nirvana.board;
 
 import com.veltpvp.nirvana.Nirvana;
 import com.veltpvp.nirvana.lobby.profile.LobbyProfile;
+import com.veltpvp.nirvana.parkour.Parkour;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,8 +42,8 @@ public class NirvanaBoardAdapter implements BoardAdapter {
                 toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Game Type " + ChatColor.GRAY + "- " + ChatColor.WHITE + profile.getQueue().getName());
 
                 long time = System.currentTimeMillis() - profile.getQueue().getInit();
-                String duration;
 
+                String duration;
                 if (time >= 60000) {
                     duration = DurationFormatUtils.formatDuration(System.currentTimeMillis() - profile.getQueue().getInit(), "mm:ss");
                 } else {
@@ -54,6 +55,25 @@ public class NirvanaBoardAdapter implements BoardAdapter {
             }
 
             toReturn.add(" ");
+
+            Parkour parkour = profile.getParkour();
+            if (parkour != null) {
+                toReturn.add(ChatColor.LIGHT_PURPLE + "Parkour Information");
+                long time = System.currentTimeMillis() - profile.getParkour().getTimeStarted();
+
+                String duration;
+                if (time >= 60000) {
+                    duration = DurationFormatUtils.formatDuration(System.currentTimeMillis() - profile.getParkour().getTimeStarted(), "mm:ss");
+                } else {
+                    duration = SECONDS_FORMATTER.format(time  / 1000.0f) + "s";
+                }
+
+
+                toReturn.add(ChatColor.GOLD + " * " + ChatColor.YELLOW + "Time Taken " + ChatColor.GRAY + "- " + ChatColor.WHITE + duration);
+
+                toReturn.add(" ");
+            }
+
             toReturn.add(ChatColor.LIGHT_PURPLE + "www.veltpvp.com");
             toReturn.add(ChatColor.GRAY + "" + ChatColor.STRIKETHROUGH + "---------------------");
         }

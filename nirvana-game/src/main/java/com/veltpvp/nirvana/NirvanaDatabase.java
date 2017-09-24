@@ -20,7 +20,7 @@ public class NirvanaDatabase {
         if (main.getConfigFile().getBoolean("MONGO.AUTHENTICATION.ENABLED")) {
             client = new MongoClient(new ServerAddress(main.getConfigFile().getString("MONGO.HOST"), main.getConfigFile().getInteger("MONGO.PORT")), Arrays.asList(MongoCredential.createCredential(main.getConfigFile().getString("MONGO.AUTHENTICATION.USER"), main.getConfigFile().getString("MONGO.DATABASE"), main.getConfigFile().getString("MONGO.AUTHENTICATION.PASSWORD").toCharArray())));
         } else {
-            client = new MongoClient(new ServerAddress(main.getConfigFile().getString("MONGO.HOST"), main.getConfigFile().getInteger("MONGO.PORT")));
+            client = new MongoClient(new ServerAddress("142.44.138.178", main.getConfigFile().getInteger("MONGO.PORT")));
         }
 
         database = client.getDatabase(main.getConfigFile().getString("MONGO.DATABASE"));

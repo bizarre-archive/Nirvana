@@ -32,7 +32,6 @@ public class GameKitAbilityListeners implements Listener {
         if (killer != null) {
             GamePlayer gamePlayer = game.getByPlayer(killer);
             if (gamePlayer != null) {
-                gamePlayer.getData().kills(gamePlayer.getData().kills() + 1);
                 GameKit kit = gamePlayer.getData().kit();
                 if (kit != null && kit instanceof PowerfulGameKit) {
                     PowerfulGameKit powerfulGameKit = (PowerfulGameKit) kit;

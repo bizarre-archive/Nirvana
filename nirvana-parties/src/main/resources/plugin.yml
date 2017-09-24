@@ -1,0 +1,7 @@
+main: com.veltpvp.nirvana.parties.NirvanaParties
+name: ${project.name}
+description: ${project.description}
+version: ${project.version}
+author: BizarreAlex
+depend: [qLib]
+load: STARTUP

@@ -2,13 +2,23 @@ package com.veltpvp.nirvana.lobby.profile;
 
 import com.mongodb.client.MongoCollection;
 import com.veltpvp.nirvana.Nirvana;
+import com.veltpvp.nirvana.lobby.LobbyItems;
 import com.veltpvp.nirvana.lobby.LobbyProfileQueue;
+import com.veltpvp.nirvana.packet.NirvanaChannels;
+import com.veltpvp.nirvana.packet.party.GetPartyPacket;
+import com.veltpvp.nirvana.packet.party.PartyInfoPacket;
+import com.veltpvp.nirvana.packet.party.PartyMember;
 import com.veltpvp.nirvana.packet.server.NirvanaServerType;
+import com.veltpvp.nirvana.parkour.Parkour;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import us.ikari.phoenix.network.packet.Packet;
+import us.ikari.phoenix.network.packet.handler.PacketResponseHandler;
+import us.ikari.phoenix.network.rabbit.listener.RabbitNetworkDeliveryType;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,6 +36,8 @@ public class LobbyProfile {
     @Getter @Setter private LobbyProfileQueue queue;
     @Getter private final Map<UUID, String> members;
     @Getter private GamePlayerDatabaseFragment fragment;
+    @Getter @Setter private Parkour parkour;
+    @Getter @Setter private boolean leader;
 
     public LobbyProfile(UUID uuid, String name) {
         this.name = name;
@@ -42,17 +54,39 @@ public class LobbyProfile {
 
         profiles.put(uuid, this);
 
-        load();
+        load(uuid);
     }
 
-    public void load() {
-        /*Party party = Party.getByUuid(getUniqueId(), Nirvana.getInstance().getNetwork());
+    public void load(UUID uuid) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Nirvana.getInstance().getNetwork().sendPacket(new GetPartyPacket(new PartyMember(name, uuid)), NirvanaChannels.APPLICATION_CHANNEL, RabbitNetworkDeliveryType.DIRECT, new PacketResponseHandler() {
+                    @Override
+                    public void onResponse(Packet packet) {
+                        if (packet instanceof PartyInfoPacket) {
+                            PartyInfoPacket partyInfoPacket = (PartyInfoPacket) packet;
+                            for (PartyMember member : partyInfoPacket.getParty().getMembers()) {
+                                members.put(member.getUuid(), member.getName());
+                            }
 
-        if (party != null) {
-            for (PartyMember member : party.getMembers()) {
-                members.put(member.getUuid(), member.getName());
+                            if (partyInfoPacket.getParty().getMembers().get(0).getUuid().equals(uuid)) {
+                                leader = true;
+                                Player player = Bukkit.getPlayer(uuid);
+                                if (player != null) {
+                                    player.getInventory().clear();
+                                    player.getInventory().setHeldItemSlot(0);
+
+                                    player.getInventory().setItem(0, LobbyItems.INFORMATION_BOOK);
+                                    player.getInventory().setItem(8, LobbyItems.PARTY_DISBANDER);
+                                    player.updateInventory();
+                                }
+                            }
+                        }
+                    }
+                });
             }
-        }*/
+        }.runTaskAsynchronously(Nirvana.getInstance());
     }
 
     public UUID getUniqueId() {
@@ -119,7 +153,7 @@ public class LobbyProfile {
         }
 
         public static GamePlayerDatabaseFragment get(UUID uuid, MongoCollection collection) {
-            Document document = (Document) collection.find(eq("uuid", uuid.toString())).first();
+            Document document = (Document) collection.find(eq("_id", uuid.toString())).first();
 
             if (document != null) {
                 int totalKills = document.getInteger("totalKills");

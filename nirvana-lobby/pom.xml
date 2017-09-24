@@ -34,15 +34,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <minimizeJar>false</minimizeJar>
-                            <relocations>
-                                <relocation>
-                                    <pattern>us.ikari.phoenix.network</pattern>
-                                    <shadedPattern>com.veltpvp.nirvana.shaded.us.ikari.phoenix.network</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -73,12 +64,6 @@
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>com.veltpvp.nirvana</groupId>
-            <artifactId>nirvana-packet</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>us.ikari.phoenix</groupId>
             <artifactId>phoenix-lang</artifactId>
@@ -116,6 +101,11 @@
         </dependency>
         <dependency>
             <groupId>us.ikari.phoenix</groupId>
+            <artifactId>phoenix-gui</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>us.ikari.phoenix</groupId>
             <artifactId>phoenix-hologram</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
@@ -143,6 +133,11 @@
             <artifactId>Hydrogen</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.veltpvp.nirvana</groupId>
+            <artifactId>nirvana-parties</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

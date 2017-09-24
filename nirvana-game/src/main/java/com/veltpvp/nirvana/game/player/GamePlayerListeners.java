@@ -24,6 +24,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -40,9 +41,9 @@ import us.ikari.phoenix.scoreboard.scoreboard.Board;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardCooldown;
 import us.ikari.phoenix.scoreboard.scoreboard.cooldown.BoardFormat;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GamePlayerListeners implements Listener {
 
@@ -67,9 +68,10 @@ public class GamePlayerListeners implements Listener {
                     return;
                 }
 
-                gamePlayer = new GamePlayer(player.getUniqueId(), player.getName());
+                gamePlayer = new GamePlayer(player.getUniqueId(), player.getName(), player.getDisplayName());
                 if (game.getPlayers().size() >= game.getLobby().getSpawnLocations().size()) {
                     gamePlayer.getData().alive(false);
+                    gamePlayer.getData().deathTime(System.currentTimeMillis());
                 }
 
                 game.getPlayers().add(gamePlayer);
@@ -95,22 +97,16 @@ public class GamePlayerListeners implements Listener {
             return;
         }
 
+        GamePlayer gamePlayer = game.getByPlayer(player);
+        if (gamePlayer == null || gamePlayer.getData().spectator() != null) {
+            return;
+        }
+
         if (main.getLocalNirvanaServer().getType() == NirvanaServerType.UHC) {
             List<ItemStack> drops = new ArrayList<>(event.getDrops());
             event.getDrops().clear();
 
             Block block = player.getLocation().getBlock();
-
-            int i = 0;
-            while (block.getLocation().clone().add(0, -1, 0).getBlock().isEmpty()) {
-                block = block.getLocation().clone().add(0, -1, 0).getBlock();
-
-                if (i >= 50) {
-                    break;
-                } else {
-                    i++;
-                }
-            }
 
             if (game.getState() == GameState.PLAY) {
                 Bukkit.broadcastMessage(ChatColor.GRAY + "[" + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "TimeBomb" + ChatColor.RESET) + ChatColor.GRAY + "] " + (ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + player.getName() + ChatColor.RESET + ChatColor.GRAY)
@@ -164,6 +160,10 @@ public class GamePlayerListeners implements Listener {
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItem();
 
+        if (main.getLocalNirvanaServer().getType() != NirvanaServerType.POTPVP) {
+            return;
+        }
+
         if (itemStack != null && itemStack.getType() == Material.ENDER_PEARL && event.getAction() == Action.RIGHT_CLICK_AIR) {
             Board board = Board.getByPlayer(player);
 
@@ -176,7 +176,7 @@ public class GamePlayerListeners implements Listener {
                     return;
                 }
 
-                new BoardCooldown(board, "pearl", 16);
+                new BoardCooldown(board, "pearl", 6);
             }
 
         }
@@ -187,16 +187,31 @@ public class GamePlayerListeners implements Listener {
     public void onPlayerDeathMessageEvent(PlayerDeathEvent event) {
         Player player = event.getEntity();
 
+        GamePlayer deathPlayer = game.getByPlayer(player);
+
+        event.setDeathMessage(null);
+
+        if (deathPlayer == null) {
+            return;
+        }
+
         Player killer = player.getKiller();
         if (killer != null) {
 
             GamePlayer gamePlayer = game.getByPlayer(killer);
-            if (gamePlayer != null && gamePlayer.getData().alive()) {
-                player.sendMessage(main.getLangFile().getString("GAME.HEALTH", LanguageConfigurationFileLocale.ENGLISH, killer.getDisplayName(), new DecimalFormat("##.0").format(killer.getHealth() / 2)));
+            if (gamePlayer == null) {
+                return;
+            }
+
+            gamePlayer.getData().kills(gamePlayer.getData().kills() + 1);
+
+            if (gamePlayer.getData().alive()) {
+                double health = killer.getHealth() / 2;
+                player.sendMessage(main.getLangFile().getString("GAME.HEALTH", LanguageConfigurationFileLocale.ENGLISH, killer.getDisplayName(), (Math.round(health * 2) / 2.0)));
             }
 
             for (Player online : Bukkit.getOnlinePlayers()) {
-                online.sendMessage(main.getLangFile().getString("DEATH_MESSAGE.PLAYER", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), killer.getDisplayName()));
+                online.sendMessage(main.getLangFile().getString("DEATH_MESSAGE.PLAYER", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), deathPlayer.getData().kills(), killer.getDisplayName(), gamePlayer.getData().kills()));
             }
 
         } else {
@@ -210,11 +225,11 @@ public class GamePlayerListeners implements Listener {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 String message;
                 if (cause == null) {
-                    message = main.getLangFile().getString("DEATH_MESSAGE.CUSTOM", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName());
+                    message = main.getLangFile().getString("DEATH_MESSAGE.CUSTOM", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), deathPlayer.getData().kills());
                 } else {
-                    message = main.getLangFile().getString("DEATH_MESSAGE." + cause.name().toUpperCase(), LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName());
+                    message = main.getLangFile().getString("DEATH_MESSAGE." + cause.name().toUpperCase(), LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), deathPlayer.getData().kills());
                     if (message == null) {
-                        message = main.getLangFile().getString("DEATH_MESSAGE.CUSTOM", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName());
+                        message = main.getLangFile().getString("DEATH_MESSAGE.CUSTOM", LanguageConfigurationFileLocale.ENGLISH, player.getDisplayName(), deathPlayer.getData().kills());
                     }
                 }
 
@@ -222,8 +237,6 @@ public class GamePlayerListeners implements Listener {
             }
 
         }
-
-        event.setDeathMessage(null);
     }
 
     @EventHandler
@@ -310,6 +323,7 @@ public class GamePlayerListeners implements Listener {
         if (gamePlayer != null) {
             gamePlayer.getData().spawnLocation(null);
             gamePlayer.getData().alive(false);
+            gamePlayer.getData().deathTime(System.currentTimeMillis());
         }
 
         event.setQuitMessage(null);
@@ -340,38 +354,56 @@ public class GamePlayerListeners implements Listener {
     }
 
     @EventHandler
+    public void onFoodLevelChangeEvent(FoodLevelChangeEvent event) {
+        Player player = (Player) event.getEntity();
+        if (event.getFoodLevel() < player.getFoodLevel()) {
+            if (new Random().nextInt(2) == 1) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeathEvent(PlayerDeathEvent event) {
         Player player = event.getEntity();
         GamePlayer gamePlayer = game.getByPlayer(player);
 
         if (gamePlayer != null) {
+
             gamePlayer.getData().alive(false);
+            gamePlayer.getData().deathTime(System.currentTimeMillis());
+            player.setHealth(player.getMaxHealth());
 
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    player.setHealth(player.getMaxHealth());
                     player.setFoodLevel(20);
                     gamePlayer.getData().spectator(new GameSpectator(player));
-
-
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if (player.getLocation().getBlockY() <= 0) {
-                                if (player.getKiller() != null) {
-                                    player.teleport(player.getKiller().getLocation());
-                                } else {
-                                    player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
-                                }
-                            }
+                    if (player.getLocation().getBlockY() <= 0) {
+                        if (player.getKiller() != null) {
+                            player.teleport(player.getKiller().getLocation());
+                        } else {
+                            player.teleport(player.getWorld().getHighestBlockAt(player.getWorld().getSpawnLocation()).getLocation());
                         }
-                    }.runTaskLater(main, 8L);
-
+                    }
                 }
-            }.runTaskLater(main, 4L);
+            }.runTaskLater(main, 2L);
 
             game.update();
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEvent(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            Player player = (Player) event.getEntity();
+            GamePlayer gamePlayer = game.getByPlayer(player);
+
+            if (gamePlayer != null && gamePlayer.getData().alive()) {
+                event.setCancelled(true);
+                player.damage(player.getMaxHealth());
+            }
+
         }
     }
 
@@ -388,14 +420,19 @@ public class GamePlayerListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoinEventScoreboard(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Scoreboard scoreboard = player.getScoreboard();
-        if (scoreboard.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
-            return;
-        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Scoreboard scoreboard = player.getScoreboard();
+                if (scoreboard.equals(Bukkit.getScoreboardManager().getMainScoreboard())) {
+                    return;
+                }
 
-        Objective objective = scoreboard.registerNewObjective("health", "health");
-        objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
-        objective.setDisplayName(ChatColor.DARK_RED + "\u2764");
+                Objective objective = scoreboard.registerNewObjective("health", "health");
+                objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+                objective.setDisplayName(ChatColor.DARK_RED + "\u2764");
+            }
+        }.runTaskLater(main, 20L);
     }
 
 }
