@@ -79,21 +79,19 @@ public class GameLobbyListeners implements Listener {
                 }
             }
 
+            if (game.getGameTime().secondsLeft(GameStartTask.DEFAULT_DURATION) <= 10) {
+                return;
+            }
+
             if (game.hasTask(GameStartTask.class)) {
-                long duration = GameStartTask.DEFAULT_DURATION;
+                long duration = game.getTask(GameStartTask.class).getTime() + game.getTask(GameStartTask.class).getDuration();
+                duration -= System.currentTimeMillis();
 
-                for (int i = 1; i <= game.getAlivePlayers().size(); i++) {
-
-                    if (i <= (game.getLobby().getSpawnLocations().size() / 2)) {
-                        continue;
-                    }
-
-                    duration -= 5;
-                }
-
-                duration = Math.max(10, duration);
+                duration = Math.max(5000, duration - 5000);
 
                 BukkitRunnable runnable = game.getTask(GameStartTask.class);
+
+                game.getGameTime().reset();
 
                 runnable.cancel();
                 game.getActiveTasks().remove(runnable);
