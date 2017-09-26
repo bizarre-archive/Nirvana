@@ -5,6 +5,10 @@ import com.veltpvp.nirvana.packet.party.PartyMember;
 import com.veltpvp.nirvana.packet.party.PartyUpdatePacket;
 import com.veltpvp.nirvana.parties.command.*;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -54,7 +58,14 @@ public class NirvanaParties extends JavaPlugin {
             Player invited = Bukkit.getPlayer(packet.getOptional().getUuid());
 
             if (invited != null) {
-                invited.sendMessage(ChatColor.YELLOW + "You have been invited to join " + ChatColor.GREEN + packet.getParty().getMembers().get(0).getName() + ChatColor.YELLOW + "'s party!");
+                TextComponent component = new TextComponent(ChatColor.YELLOW + "You have been invited to join " + ChatColor.GREEN + packet.getParty().getMembers().get(0).getName() + ChatColor.YELLOW + "'s party!");
+                TextComponent extra = new TextComponent(ChatColor.GRAY + " [Click here to join]");
+                extra.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Click here to join " + ChatColor.LIGHT_PURPLE + packet.getParty().getMembers().get(0).getName() + "'s party.").create()));
+                extra.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party join " + packet.getParty().getMembers().get(0).getName()));
+
+                component.addExtra(extra);
+
+                invited.spigot().sendMessage(component);
             }
 
             for (PartyMember member : packet.getParty().getMembers()) {
