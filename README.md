@@ -1,2 +1,1 @@
-# Nirvana
-Skywars plugin and infrastructure for the VeltPvP network.
+Excuse some of the commit messages .. simpler times 😔.
